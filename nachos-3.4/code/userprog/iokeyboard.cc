@@ -1,6 +1,6 @@
 void handle_SC_ReadInt() {
 	// Input: Keyboard
-	// Output: ONE interger
+	// Output: Write answer into r2
 	char* buffer;
 	int MAX_BUFFER = 255;
 	buffer = new char[MAX_BUFFER + 1];
