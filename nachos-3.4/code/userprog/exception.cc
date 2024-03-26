@@ -25,6 +25,7 @@
 #include "system.h"
 #include "syscall.h"
 
+#include "iofile.h"
 /* New file - call with: 'handle_SC_*functionname*' */
 
 //----------------------------------------------------------------------
@@ -99,6 +100,49 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 	return i;
 }
 
+// max length of file name
+#define MAX_FILENAME_LEN 32
+
+// Input:
+// 		Reg 4: address of file name in user memory space
+// Output:
+// 		Reg 2: 0 if success; otherwise, -1
+void handle_SC_CreateFile() {
+    int virtualAddr = machine->readRegister(4);
+	printf('Reading file name...\n');
+	char* fname = User2System(virtualAddr, MAX_FILENAME_LEN);
+	if (!fname) {
+		printf("Not enough memory in system!\n");
+		machine->WriteRegister(2, -1); 	// error
+		delete[] fname;
+		return;
+	}
+
+	printf("Finish reading file name.\n");
+	printf("File name: <%s>", fname);
+
+	machine->WriteRegister(2, 0);	// success
+	fileSystem->
+}
+
+void handle_SC_Read() {
+    
+}
+
+
+void handle_SC_Write() {
+    
+}
+
+
+void handle_SC_Close() {
+    
+}
+
+
+void handle_SC_Open() {
+    
+}
 
 /* EXCEPTION HANDLER */
 
@@ -106,6 +150,9 @@ void ExceptionHandler(ExceptionType which) {
     int type = machine->ReadRegister(2); // This is a global variable for SynchConsole
     // NOTICE: R2 Contains the syscall task and the result(s)/variable(s) that will be return, the rest or just for variables handler
 
+switch (which) {
+	case NoException:
+		return;
 
 	switch (which) {
 		case NoException:
@@ -127,6 +174,20 @@ void ExceptionHandler(ExceptionType which) {
 				interrupt->Halt();
 				return;
 
+			case SC_CreateFile:
+			{
+				handle_SC_CreateFile();
+				break;
+			}
+
+
+    /* if ((which == SyscallException) && (type == SC_Halt)) {
+	DEBUG('a', "Shutdown, initiated by user program.\n");
+   	interrupt->Halt();
+    } else {
+	printf("Unexpected user mode exception %d %d\n", which, type);
+	ASSERT(FALSE);
+    } Old habit dies young*/
 				case SC_ReadInt:
 					handle_SC_ReadInt();
 				case SC_PrintInt:

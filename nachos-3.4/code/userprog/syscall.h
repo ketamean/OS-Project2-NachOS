@@ -18,17 +18,17 @@
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
  */
-#define SC_Halt		0
-#define SC_Exit		1
-#define SC_Exec		2
-#define SC_Join		3
-#define SC_Create	4
-#define SC_Open		5
-#define SC_Read		6
-#define SC_Write	7
-#define SC_Close	8
-#define SC_Fork		9
-#define SC_Yield	10
+#define SC_Halt		    0
+#define SC_Exit		    1
+#define SC_Exec		    2
+#define SC_Join		    3
+#define SC_CreateFile   4
+#define SC_Open		    5
+#define SC_Read		    6
+#define SC_Write	    7
+#define SC_Close	    8
+#define SC_Fork		    9
+#define SC_Yield	    10
 
 #define SC_ReadInt      11
 #define SC_PrintInt     12
@@ -96,12 +96,12 @@ typedef int OpenFileId;
 #define ConsoleOutput	1  
  
 /* Create a Nachos file, with "name" */
-void Create(char *name);
+int CreateFile(char *name);
 
 /* Open the Nachos file "name", and return an "OpenFileId" that can 
  * be used to read and write to the file.
  */
-OpenFileId Open(char *name);
+OpenFileId Open(char *name, int type);
 
 /* Write "size" bytes from "buffer" to the open file. */
 void Write(char *buffer, int size, OpenFileId id);
@@ -115,7 +115,7 @@ void Write(char *buffer, int size, OpenFileId id);
 int Read(char *buffer, int size, OpenFileId id);
 
 /* Close the file, we're done reading and writing to it. */
-void Close(OpenFileId id);
+int Close(OpenFileId id);
 
 
 
@@ -156,10 +156,10 @@ void PrintChar(char character);
 
 /* IMPORTANT: THIS WILL BE THE MAIN REASON FOR USING THE User2System() AND System2User() */
 /* Uses SynchConsole to read ONE string into buffer (ONLY END WHEN 'enter' or >= length [in this case 255]) */
-void ReadString (char[] buffer, int length)
+void ReadString (char* buffer, int length);
 
 /* Uses SynchConsole to print out ONE string from buffer */
-void PrintString (char[] buffer)
+void PrintString (char* buffer);
 
 #endif /* IN_ASM */
 
