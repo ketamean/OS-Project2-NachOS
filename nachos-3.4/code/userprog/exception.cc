@@ -25,10 +25,7 @@
 #include "system.h"
 #include "syscall.h"
 
-/* New file - call with: 'handle_SC_*functionname*' */
-#include "iokeyboard.cc"
-#include "iofile.cc"
-
+#include "iofile.h"
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -101,6 +98,49 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 	return i;
 }
 
+// max length of file name
+#define MAX_FILENAME_LEN 32
+
+// Input:
+// 		Reg 4: address of file name in user memory space
+// Output:
+// 		Reg 2: 0 if success; otherwise, -1
+void handle_SC_CreateFile() {
+    int virtualAddr = machine->readRegister(4);
+	printf('Reading file name...\n');
+	char* fname = User2System(virtualAddr, MAX_FILENAME_LEN);
+	if (!fname) {
+		printf("Not enough memory in system!\n");
+		machine->WriteRegister(2, -1); 	// error
+		delete[] fname;
+		return;
+	}
+
+	printf("Finish reading file name.\n");
+	printf("File name: <%s>", fname);
+
+	machine->WriteRegister(2, 0);	// success
+	fileSystem->
+}
+
+void handle_SC_Read() {
+    
+}
+
+
+void handle_SC_Write() {
+    
+}
+
+
+void handle_SC_Close() {
+    
+}
+
+
+void handle_SC_Open() {
+    
+}
 
 /* EXCEPTION HANDLER */
 
@@ -108,7 +148,6 @@ void ExceptionHandler(ExceptionType which)
 {
     int type = machine->ReadRegister(2); // This is a global variable for SynchConsole
     // NOTICE: R2 Contains the syscall task and the result(s)/variable(s) that will be return, the rest or just for variables handler
-
 
 switch (which) {
 	case NoException:
@@ -130,22 +169,11 @@ switch (which) {
 			interrupt->Halt();
 			return;
 
-			case SC_ReadInt:
-		        	return handle_SC_ReadInt();
-			case SC_PrintInt:
-				return handle_SC_PrintInt();
-			case SC_ReadFloat:
-		        	return handle_SC_ReadFloat();
-			case SC_PrintFloat:
-		        	return handle_SC_PrintFloat();
-			case SC_ReadChar:
-		        	return handle_SC_ReadChar();
-			case SC_PrintChar:
-		        	return handle_SC_PrintChar();
-			case SC_ReadString:
-		        	return handle_SC_ReadString();
-			case SC_PrintString:
-		        	return handle_SC_PrintString();		
+			case SC_CreateFile:
+			{
+				handle_SC_CreateFile();
+				break;
+			}
 
 
     /* if ((which == SyscallException) && (type == SC_Halt)) {
