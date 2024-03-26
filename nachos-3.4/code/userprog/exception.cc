@@ -418,6 +418,7 @@ void handle_SC_ReadChar() {
 	interrupt->Halt();
 	return;
 }
+
 void handle_SC_PrintChar() {
 	// Input: ONE char, retrieved from f4 using machine->ReadRegisterF(4).
 	// Output: Print ONE char onto the Console
@@ -427,15 +428,46 @@ void handle_SC_PrintChar() {
 	return;
 }
 
-void handle_SC_ReadString();
-void handle_SC_PrintString();	
+void handle_SC_ReadString() {
+	// Input: Buffer(char*), do dai toi da cua chuoi nhap vao(int)
+	// Output: String to 
+	int virtAddr, length;
+	char* buffer;
+	virtAddr = machine->ReadRegister(4); // Get address of the buffer in User Space, retrieved from r4
+	length = machine->ReadRegister(5); // Length input of the buffer, retrieved from r5
+
+	/* FIRST APPERANCE OF User2System - System2User methods */
+	buffer = User2System(virtAddr, length); // Copy string from User Space to System Space
+	gSynchConsole->Read(buffer, length); // Read it (duh)
+	System2User(virtAddr, length, buffer); // Copy it back to User Space
+	delete buffer; 
+	interrupt->Halt();
+	return;	
+}
+
+void handle_SC_PrintString() {
+	// Input: Buffer(char*)
+	// Output: Print Buffer onto the Console
+	int virtAddr;
+	char* buffer;
+	virtAddr = machine->ReadRegister(4); // Get address of the buffer in User Space, retrieved from r4
+	buffer = User2System(virtAddr, 255); // Copy string from User Space to System Space
+	int length = 0; // Length of the string (default 0)
+	while (buffer[length] != 0) {
+		length++; // Count the length of the string
+	}
+	gSynchConsole->Write(buffer, length + 1); // Write the string to the Console (length + 1 for the null terminator)
+	delete buffer; 
+	interrupt->Halt();
+	return;	
+}
 
 // Input:
 // 		Reg 4: address of file name in user memory space
 // Output:
 // 		Reg 2: 0 if success; otherwise, -1
 void handle_SC_CreateFile() {
-    int virtualAddr = machine->readRegister(4);
+    int virtualAddr = machine->ReadRegister(4);
 	printf('Reading file name...\n');
 	char* fname = User2System(virtualAddr, MAX_FILENAME_LEN);
 	if (!fname) {
@@ -490,7 +522,7 @@ switch (which) {
 			printf("\n\n No valid translation found");
 			interrupt->Halt();
 			break;
-		case SysCallException:
+		case SyscallException:
 			switch(type) {
 
 				case SC_Halt:
