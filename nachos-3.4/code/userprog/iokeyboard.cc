@@ -1,10 +1,14 @@
+#include "syscall.h"
+#include "system.h"
+
 void handle_SC_ReadInt() {
 	// Input: Keyboard
 	// Output: Write answer into r2
 	char* buffer;
 	int MAX_BUFFER = 255;
 	buffer = new char[MAX_BUFFER + 1];
-	int numbytes = gSynchConsole->Read(buffer, MAX_BUFFER);// Read the buffer char string and return it <= MAX_BUFFER (of course)
+	int numbytes = gSynchConsole->Read(buffer, MAX_BUFFER); // Read the buffer char string and return it <= MAX_BUFFER (of course)
+	// using gSynchConsole from system.h: access between console and users.
 	int number = 0; // Answer (if any)
 			
 	/* THIS IS WHERE THE MAGIC HAPPENS: TURNING CHAR* INTO INTERGER IF VALID */

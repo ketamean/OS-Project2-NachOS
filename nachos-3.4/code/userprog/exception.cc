@@ -26,8 +26,6 @@
 #include "syscall.h"
 
 /* New file - call with: 'handle_SC_*functionname*' */
-#include "iokeyboard.cc"
-#include "iofile.cc"
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -104,55 +102,54 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 
 /* EXCEPTION HANDLER */
 
-void ExceptionHandler(ExceptionType which)
-{
+void ExceptionHandler(ExceptionType which) {
     int type = machine->ReadRegister(2); // This is a global variable for SynchConsole
     // NOTICE: R2 Contains the syscall task and the result(s)/variable(s) that will be return, the rest or just for variables handler
 
 
-switch (which) {
-	case NoException:
-		return;
-
-	case PageFaultException:
-		DEBUG('a', "\n No valid translation found");
-		printf("\n\n No valid translation found");
-		interrupt->Halt();
-		break;
-	case SysCallException:
-		switch(type) {
-
-			case SC_Halt:
-			// Input: None
-			// Output: System Shutdown Call
-			DEBUG('a', "\nShutdown, initiated by user program. ");
-			printf("\nShutdown, initiated by user program. ");
-			interrupt->Halt();
+	switch (which) {
+		case NoException:
 			return;
 
-			case SC_ReadInt:
-		        	return handle_SC_ReadInt();
-			case SC_PrintInt:
-				return handle_SC_PrintInt();
-			case SC_ReadFloat:
-		        	return handle_SC_ReadFloat();
-			case SC_PrintFloat:
-		        	return handle_SC_PrintFloat();
-			case SC_ReadChar:
-		        	return handle_SC_ReadChar();
-			case SC_PrintChar:
-		        	return handle_SC_PrintChar();
-			case SC_ReadString:
-		        	return handle_SC_ReadString();
-			case SC_PrintString:
-		        	return handle_SC_PrintString();		
+		case PageFaultException:
+			DEBUG('a', "\n No valid translation found");
+			printf("\n\n No valid translation found");
+			interrupt->Halt();
+			break;
+		case SysCallException:
+			switch(type) {
 
+				case SC_Halt:
+				// Input: None
+				// Output: System Shutdown Call
+				DEBUG('a', "\nShutdown, initiated by user program. ");
+				printf("\nShutdown, initiated by user program. ");
+				interrupt->Halt();
+				return;
 
-    /* if ((which == SyscallException) && (type == SC_Halt)) {
-	DEBUG('a', "Shutdown, initiated by user program.\n");
-   	interrupt->Halt();
-    } else {
-	printf("Unexpected user mode exception %d %d\n", which, type);
-	ASSERT(FALSE);
-    } Old habit dies young*/
+				case SC_ReadInt:
+						return handle_SC_ReadInt();
+				case SC_PrintInt:
+					return handle_SC_PrintInt();
+				case SC_ReadFloat:
+						return handle_SC_ReadFloat();
+				case SC_PrintFloat:
+						return handle_SC_PrintFloat();
+				case SC_ReadChar:
+						return handle_SC_ReadChar();
+				case SC_PrintChar:
+						return handle_SC_PrintChar();
+				case SC_ReadString:
+						return handle_SC_ReadString();
+				case SC_PrintString:
+						return handle_SC_PrintString();		
+			}		
+	}
+		/* if ((which == SyscallException) && (type == SC_Halt)) {
+		DEBUG('a', "Shutdown, initiated by user program.\n");
+		interrupt->Halt();
+		} else {
+		printf("Unexpected user mode exception %d %d\n", which, type);
+		ASSERT(FALSE);
+		} Old habit dies young*/
 }
