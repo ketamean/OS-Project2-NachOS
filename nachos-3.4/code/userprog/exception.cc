@@ -128,21 +128,21 @@ void ExceptionHandler(ExceptionType which) {
 				return;
 
 				case SC_ReadInt:
-						return handle_SC_ReadInt();
+					handle_SC_ReadInt();
 				case SC_PrintInt:
-					return handle_SC_PrintInt();
+					handle_SC_PrintInt();
 				case SC_ReadFloat:
-						return handle_SC_ReadFloat();
+					handle_SC_ReadFloat();
 				case SC_PrintFloat:
-						return handle_SC_PrintFloat();
+					handle_SC_PrintFloat();
 				case SC_ReadChar:
-						return handle_SC_ReadChar();
+					handle_SC_ReadChar();
 				case SC_PrintChar:
-						return handle_SC_PrintChar();
+					handle_SC_PrintChar();
 				case SC_ReadString:
-						return handle_SC_ReadString();
+					handle_SC_ReadString();
 				case SC_PrintString:
-						return handle_SC_PrintString();		
+					handle_SC_PrintString();		
 			}		
 	}
 		/* if ((which == SyscallException) && (type == SC_Halt)) {
