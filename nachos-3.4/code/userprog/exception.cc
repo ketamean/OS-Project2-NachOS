@@ -24,8 +24,7 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
-
-#include "iofile.h"
+#include "machine.h"
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -107,7 +106,7 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 // 		Reg 2: 0 if success; otherwise, -1
 void handle_SC_CreateFile() {
     int virtualAddr = machine->readRegister(4);
-	printf('Reading file name...\n');
+	printf("Reading file name...\n");
 	char* fname = User2System(virtualAddr, MAX_FILENAME_LEN);
 	if (!fname) {
 		printf("Not enough memory in system!\n");
@@ -119,8 +118,10 @@ void handle_SC_CreateFile() {
 	printf("Finish reading file name.\n");
 	printf("File name: <%s>", fname);
 
+	bool succ = fileSystem->Create(fname, 0);	// args: filename = fname, initialSize = 0
+
 	machine->WriteRegister(2, 0);	// success
-	fileSystem->
+	delete[] fname;
 }
 
 void handle_SC_Read() {
@@ -149,32 +150,33 @@ void ExceptionHandler(ExceptionType which)
     int type = machine->ReadRegister(2); // This is a global variable for SynchConsole
     // NOTICE: R2 Contains the syscall task and the result(s)/variable(s) that will be return, the rest or just for variables handler
 
-switch (which) {
-	case NoException:
-		return;
-
-	case PageFaultException:
-		DEBUG('a', "\n No valid translation found");
-		printf("\n\n No valid translation found");
-		interrupt->Halt();
-		break;
-	case SysCallException:
-		switch(type) {
-
-			case SC_Halt:
-			// Input: None
-			// Output: System Shutdown Call
-			DEBUG('a', "\nShutdown, initiated by user program. ");
-			printf("\nShutdown, initiated by user program. ");
-			interrupt->Halt();
+	switch (which) {
+		case NoException:
 			return;
 
-			case SC_CreateFile:
-			{
-				handle_SC_CreateFile();
-				break;
-			}
+		case PageFaultException:
+			DEBUG('a', "\n No valid translation found");
+			printf("\n\n No valid translation found");
+			interrupt->Halt();
+			break;
+		case SyscallException:
+			switch(type) {
 
+				case SC_Halt:
+				// Input: None
+				// Output: System Shutdown Call
+				DEBUG('a', "\nShutdown, initiated by user program. ");
+				printf("\nShutdown, initiated by user program. ");
+				interrupt->Halt();
+				return;
+
+				case SC_CreateFile:
+				{
+					handle_SC_CreateFile();
+					break;
+				}
+			}
+	}
 
     /* if ((which == SyscallException) && (type == SC_Halt)) {
 	DEBUG('a', "Shutdown, initiated by user program.\n");
