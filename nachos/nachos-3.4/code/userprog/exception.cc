@@ -156,7 +156,7 @@ void handle_SC_ReadInt() {
 		    	DEBUG('a', "\n The integer number is not valid \n");
 		    	machine->WriteRegister(2, 0);
 				delete buffer;
-				IncrementR();
+				//IncrementR();
 				//interrupt->Halt();
                 return;
 			}
@@ -171,7 +171,7 @@ void handle_SC_ReadInt() {
 	    	DEBUG('a', "\n The integer number is not valid \n");
 	    	machine->WriteRegister(2, 0);
 			delete buffer;
-			IncrementR();
+			//IncrementR();
 			//interrupt->Halt(); // Halt() because of invalid input
 			return;
 		}
@@ -201,7 +201,7 @@ void handle_SC_PrintInt() {
 	if (number == 0) 
 	{
 		gSynchConsole->Write("0", 1); // print 0
-		IncrementR();
+		//IncrementR();
         return;     
 	}
 	
@@ -240,7 +240,7 @@ void handle_SC_PrintInt() {
 		buffer[numLength + 1] = 0;
 		gSynchConsole->Write(buffer, numLength + 1); // +1 to counter for the '-' 
 		delete buffer;
-		IncrementR();
+		//IncrementR();
         return; 
 	}
 	buffer[numLength] = 0;	
@@ -285,7 +285,7 @@ void handle_SC_ReadFloat() {
                 DEBUG('a', "\n The number is not a valid float \n");
                 machine->WriteRegister(2, 0);
                 delete buffer;
-                IncrementR();
+                //IncrementR();
 				//interrupt->Halt();
         		return; 
             }
@@ -297,7 +297,7 @@ void handle_SC_ReadFloat() {
             DEBUG('a', "\n The number is not a valid float \n");
             machine->WriteRegister(2, 0);
             delete buffer;
-            IncrementR();
+            //IncrementR();
 			//interrupt->Halt();
         	return; 
         }
@@ -332,7 +332,7 @@ void handle_SC_PrintFloat() {
     if (number == 0.0f) {
 		printf("\nOutput: \n");
         gSynchConsole->Write("0.0", 3); // print 0.0
-        IncrementR();
+        //IncrementR();
         return;   
     }
 
@@ -623,37 +623,53 @@ void ExceptionHandler(ExceptionType which) {
 					break;
 				}
 				case SC_ReadInt:
+				{
 					handle_SC_ReadInt();
 					IncrementR();
 					break;
+				}
 				case SC_PrintInt:
+				{
 					handle_SC_PrintInt();
 					IncrementR();
 					break;
+				}
 				case SC_ReadFloat:
+				{
 					handle_SC_ReadFloat();
 					IncrementR();
 					break;
+				}
 				case SC_PrintFloat:
+				{
 					handle_SC_PrintFloat();
 					IncrementR();
 					break;
+				}
 				case SC_ReadChar:
+				{
 					handle_SC_ReadChar();
 					IncrementR();
 					break;
+				}
 				case SC_PrintChar:
+				{
 					handle_SC_PrintChar();
 					IncrementR();
 					break;
+				}
 				case SC_ReadString:
+				{
 					handle_SC_ReadString();
 					IncrementR();
 					break;
+				}
 				case SC_PrintString:
+				{
 					handle_SC_PrintString();
 					IncrementR();
-					break;		
+					break;
+				}		
 			}
 	}
 }
