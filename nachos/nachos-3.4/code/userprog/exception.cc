@@ -534,7 +534,35 @@ void handle_SC_WriteFile() {
 
 
 void handle_SC_CloseFile() {
-    
+// Input:
+//		Reg 4: OpenFileID of the file to be closed
+// Output:
+//		Reg 2: OpenFileID which is the index of the opening file in the file table, in range [0,9] (10 files in total); or -1 if an error occurs
+    OpenFileId fileid = machine->ReadRegister(4);
+	if (fileid == 0) {
+		printf("Cannot close stdin.\n");
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	} else if (fileid == 1) {
+		printf("Cannot close stdout.\n");
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	} else if (fileid >= N_FILES_IN_TABLE) {
+		printf("File ID cannot exceed %d\n", N_FILES_IN_TABLE);
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	}
+
+	OpenFile* f = fileSystem->file_table[fileid];
+	if (!f) {
+		printf("The chosen file is not currently opened.\n");
+		machine->WriteRegister(2, -1);
+		return;
+	} // else
+	delete f;
+	fileSystem->file_table[fileid] = NULL;
+	printf("File is opened with ID <%d>\n", fileid);
+	machine->WriteRegister(2, 0);
 }
 
 
