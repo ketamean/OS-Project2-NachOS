@@ -39,7 +39,10 @@ class OpenFile {
     int ReadAt(char *into, int numBytes, int position) { 
     		Lseek(file, position, 0); 
 		return ReadPartial(file, into, numBytes); 
-		}	
+		}
+	int& CurPos() {
+		return currentOffset;
+	}
     int WriteAt(char *from, int numBytes, int position) { 
     		Lseek(file, position, 0); 
 		WriteFile(file, from, numBytes); 
@@ -73,7 +76,7 @@ class OpenFile {
 					// at "sector" on the disk		
 	OpenFile(int sector, int _type);
     ~OpenFile();			// Close the file
-
+	int& CurPos();	// return the current position of the file cursor
     void Seek(int position); 		// Set the position from which to 
 					// start reading/writing -- UNIX lseek
 

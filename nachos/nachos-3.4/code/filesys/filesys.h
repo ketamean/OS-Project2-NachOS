@@ -50,7 +50,7 @@ class FileSystem {
 			this->file_table[i] = NULL;
 		}
 		this->Create("stdin", 0);
-		this->Create("stdin", 0);
+		this->Create("stdout", 0);
 		this->Open("stdin", 2);
 		this->Open("stdout", 3);
 	}

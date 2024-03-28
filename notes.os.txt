@@ -1,4 +1,6 @@
-- Lưu ý: Có tới hai phiên bản class FileSystem và hai phiên bản class OpenFile (một phiên bản là do Nachos tự handle, cái còn lại là Nachos gọi hàm của UNIX; thông thường các chương trình sẽ dùng phiên bản Nachos gọi hàm của UNIX (tức là trường hợp 2)). Bên dưới đây khi nói tới thêm sửa xóa... các method trong các class này thì tức là thực hiện trên cả hai phiên bản của class đó.
+- Lưu ý:
+	1. Có tới hai phiên bản class FileSystem và hai phiên bản class OpenFile (một phiên bản là do Nachos tự handle, cái còn lại là Nachos gọi hàm của UNIX; thông thường các chương trình sẽ dùng phiên bản Nachos gọi hàm của UNIX (tức là trường hợp 2)). Bên dưới đây khi nói tới thêm sửa xóa... các method trong các class này thì tức là thực hiện trên cả hai phiên bản của class đó.
+	2. Khi đọc ghi file là đọc ghi từ đầu file.
 ========================================================
 - Thêm xóa sửa trong các class FileSystem và OpenFile
 	- Trong code/filesys/filesys.h, thêm một mảng các phần tử là các con trỏ OpenFile* (OpenFile** file_table). Đây là bảng file của tiến trình (public, không private), bao gồm các file đang mở
@@ -16,6 +18,8 @@
 	- Thêm FileSystem::~FileSystem() để deallocate bảng file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	- Sửa lại method FileSystem::Remove(): tìm file theo tên rồi deallocate khỏi bảng file, gán ô thành NULL (đánh dấu đó là ô trống)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Thêm method OpenFile::CurPos() để trả về attribute `seekPosition` của OpenFile. Attribute này giữ vị trí hiện tại của con trỏ chuột mà từ đó sẽ đọc và viết vào file.
 ========================================================
 - CreateFile:
 	Error khi 1 trong những điều sau xảy ra:
@@ -23,10 +27,14 @@
 		Không thể chuyển từ user memory space sang system memory space (hết bộ nhớ)
 ========================================================
 - OpenF:
-	Trước khi mở file, kiểm tra bảng file có còn trống không. Nếu trống thì mở (rồi return OpenFileID, cũng là index của OpenFile trong bảng file index), nếu không thì trả về lỗi báo cho người dùng (return -1). Ngoài type = 0 = 1 thì type = 2 là stdin, = 3 là stdout. Type này phải do người dùng truyền vào. Nếu tên file là "stdin" mà sai type != 2 thì cũng không thể mở console input. Nếu type = 2 hoặc 3 thì sẽ tự động mở console tương ứng mà không check tới tên
+	Trước khi mở file, kiểm tra bảng file có còn trống không. Nếu trống thì mở (rồi return OpenFileID, cũng là index của OpenFile trong bảng file index), nếu không thì trả về lỗi báo cho người dùng (return -1). Ngoài type = 0 = 1 thì type = 2 là stdin, = 3 là stdout. Type này phải do người dùng truyền vào.
+	Nếu một trong hai mệnh đề dưới đây xảy ra, và cái còn lại KHÔNG xảy ra, thì sẽ báo lỗi:
+		1. Tên file là stdin/stdout
+		2. Type là 2/3
+	Nghĩa là type 2 3 và tên file stdin stdout là unique, không cho trùng lặp
 ========================================================
-- CloseF: check xem ID phải 0 1 không (stdin stdout). Nếu phải thì không cho đóng file, trả về luôn -1. Không thì check xem file còn mở không (file_table[id] == NULL hay không). Nếu còn mở thì đóng lại (trả về 0), nếu đã đóng thì không đóng được nữa, báo lỗi (trả về -1)
+- CloseF: check xem ID phải 0 1 không (stdin stdout). Nếu phải thì không cho đóng file, trả về -1. Nếu không phải stdin stdout thì check xem file còn mở không (file_table[id] == NULL hay không). Nếu còn mở thì cho phép đóng lại (trả về 0), nếu đã đóng thì không đóng được nữa, báo lỗi (trả về -1).
 ========================================================
-- ReadF: check xem file có mở không (file_table[id] == NULL hay không). Nếu bằng thì file chưa mở (lỗi), trả về -1. Nếu không thì check tiếp xem có đang ở EOF không. Nếu EOF thì gán buffer bằng null (không có gì để đọc) và trả về -2. Nếu không phải EOF thì đọc cho tới khi hết charcount hoặc cho tới khi gặp EOF (điều kiện nào gặp trước thì dừng ở đó). Trả về số kí tự đọc được = min(charcount, remaining_characters)
+- ReadF: check xem file có mở không (file_table[id] == NULL hay không). Nếu bằng thì file chưa mở (lỗi), trả về -1. Nếu không thì check tiếp xem có đang ở EOF không. Nếu EOF thì gán buffer bằng null (không có gì để đọc) và trả về -2. Nếu không phải EOF thì đọc cho tới khi hết charcount hoặc cho tới khi gặp EOF (điều kiện nào gặp trước thì dừng ở đó). Trả về số kí tự đọc được = min(charcount, remaining_characters). File sẽ được đọc tiếp kể từ vị trí pos = OpenFile::CurPos(). Có một method của OpenFile cho phép set vị trí của cursor nhưng trong phạm vi đồ án này ta sẽ đọc kể từ vị trí trước đó, khi đọc hết file gặp EOF thì sẽ kết thúc lần đọc file hiện tại và lần đọc tiếp theo sẽ quay lại điểm bắt đầu để đọc lại từ đầu.
 ========================================================
 - WriteF: check xem file có mở không (file_table[id] == NULL hay không). Không thì lỗi, trả về -1. Nếu phải thì check tiếp file có quyền write không (type = 0 thì được ghi). Nếu không thì trả về -1. Nếu có quyền ghi thì ghi. Nếu ghi lỗi (do hết bộ nhớ, v.v) thì trả về -1;
