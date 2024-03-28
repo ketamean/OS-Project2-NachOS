@@ -1,8 +1,8 @@
 #include "syscall.h"
 
 int main() {
-	//int answer = ReadInt();
-	//PrintInt(answer);
+	//int i = ReadInt();
+	//PrintInt(i);
 	
 	float f = ReadFloat();
 	PrintFloat(f);
@@ -10,9 +10,8 @@ int main() {
 	//char c = ReadChar();
 	//PrintChar(c);
 
-	//int legth;
 	//char s[255];
-	//length = ReadInt();
+	//int length = ReadInt();
 	//ReadString(s, length);
 	//PrintString(s);
 

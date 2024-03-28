@@ -122,6 +122,7 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 void handle_SC_ReadInt() {
 	// Input: Keyboard
 	// Output: Write answer into r2
+	printf("\nInput: ");
 	char* buffer;
 	int MAX_BUFFER = 255;
 	buffer = new char[MAX_BUFFER + 1];
@@ -201,6 +202,7 @@ void handle_SC_PrintInt() {
 	int number = machine->ReadRegister(4); 
 	if (number == 0) 
 	{
+		printf("\nOutput: \n");
 		gSynchConsole->Write("0", 1); // print 0
 		//IncrementR();
         return;     
@@ -239,12 +241,14 @@ void handle_SC_PrintInt() {
 	{
 		buffer[0] = '-';
 		buffer[numLength + 1] = 0;
+		printf("\nOutput: \n");
 		gSynchConsole->Write(buffer, numLength + 1); // +1 to counter for the '-' 
 		delete buffer;
 		//IncrementR();
         return; 
 	}
 	buffer[numLength] = 0;	
+	printf("\nOutput: \n");
 	gSynchConsole->Write(buffer, numLength);
 	delete buffer;       
 	return;
@@ -255,6 +259,7 @@ void handle_SC_PrintInt() {
 void handle_SC_ReadFloat() {
     // Input: Keyboard
     // Output: Write answer into r2
+	printf("\nInput: ");
     char* buffer;
     int MAX_BUFFER = 255;
     buffer = new char[MAX_BUFFER + 1];
@@ -323,18 +328,18 @@ void handle_SC_ReadFloat() {
     {
         number *= -1.0f;
     }
-    machine->WriteRegister(2, number); // Record the final number into f2 (result)
+    machine->WriteRegister(2, number); // Record the final number into r2 (result)
     delete buffer; // For memory preservation purpose   
 	return;
 }
 
 void handle_SC_PrintFloat() {
-    // Input: ONE float, retrieved from f4 using machine->ReadRegisterF(4).
+    // Input: ONE float, retrieved from r4 using machine->ReadRegister(4).
     // Output: Print ONE float onto the Console
     float number = machine->ReadRegister(4);
     if (number == 0.0f) {
 		printf("\nOutput: \n");
-        gSynchConsole->Write("0.0", 3); // print 0.0
+        gSynchConsole->Write("0.0", 3); // print 0.0, the 3 is the number of bytes to write
         //IncrementR();
         return;   
     }
