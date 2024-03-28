@@ -157,7 +157,7 @@ void handle_SC_ReadInt() {
 		    	machine->WriteRegister(2, 0);
 				delete buffer;
 				IncrementR();
-				interrupt->Halt();
+				//interrupt->Halt();
                 return;
 			}
 	    	}
@@ -172,7 +172,7 @@ void handle_SC_ReadInt() {
 	    	machine->WriteRegister(2, 0);
 			delete buffer;
 			IncrementR();
-			interrupt->Halt(); // Halt() because of invalid input
+			//interrupt->Halt(); // Halt() because of invalid input
 			return;
 		}
 		lastIndex = i;    
@@ -286,7 +286,7 @@ void handle_SC_ReadFloat() {
                 machine->WriteRegister(2, 0);
                 delete buffer;
                 IncrementR();
-				interrupt->Halt();
+				//interrupt->Halt();
         		return; 
             }
             //lastIndex = i - 1; // commented out because we want to allow for trailing zeroes
@@ -298,7 +298,7 @@ void handle_SC_ReadFloat() {
             machine->WriteRegister(2, 0);
             delete buffer;
             IncrementR();
-			interrupt->Halt();
+			//interrupt->Halt();
         	return; 
         }
         lastIndex = i;    
@@ -416,7 +416,7 @@ void handle_SC_ReadChar() {
 		printf("\n\n Only one character allowed \n");
 		DEBUG('a', "\n Only one character allowed \n");
 		machine->WriteRegister(2, 0);
-		interrupt->Halt();
+		//interrupt->Halt();
 		return;
 	}
 	else if(numBytes == 0) // Empty
@@ -424,7 +424,7 @@ void handle_SC_ReadChar() {
 		printf("\n\n Empty input \n");
 		DEBUG('a', "\n Empty input \n");
 		machine->WriteRegister(2, 0);
-		interrupt->Halt();
+		//interrupt->Halt();
 		return;
 	}
 	else
