@@ -1,0 +1,32 @@
+- Lưu ý: Có tới hai phiên bản class FileSystem và hai phiên bản class OpenFile (một phiên bản là do Nachos tự handle, cái còn lại là Nachos gọi hàm của UNIX; thông thường các chương trình sẽ dùng phiên bản Nachos gọi hàm của UNIX (tức là trường hợp 2)). Bên dưới đây khi nói tới thêm sửa xóa... các method trong các class này thì tức là thực hiện trên cả hai phiên bản của class đó.
+========================================================
+- Thêm xóa sửa trong các class FileSystem và OpenFile
+	- Trong code/filesys/filesys.h, thêm một mảng các phần tử là các con trỏ OpenFile* (OpenFile** file_table). Đây là bảng file của tiến trình (public, không private), bao gồm các file đang mở
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Thêm int type vào OpenFile (để biết kiểu mở file, 0 là đọc và ghi, 1 là chỉ đọc, bổ sung thêm các giá trị 2 là stdin, 3 là stdout)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Thêm đoạn code vào method FileSystem::Create
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Thêm method int FileSystem::Open(char* name, int _type) (_type là kiểu mở file, 0 là rw, 1 là read only,...). Hàm Open sẽ kiểm tra tính hợp lệ của file muốn mở, tìm vị trí trong bảng file cho file này và trả vè OpenFileID của nó. Có thể truy cập đến OpenFile* bằng fileSystem->file_table[id]. Nếu id trả về bằng -1 thì file không mở được do đã hết chỗ trong bảng file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Overload method OpenFile::Open(char* name, int _type) (_type là kiểu mở file, 0 là rw, 1 là read only, 2 là stdin, 3 là stdout)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Thêm method FileSystem::getIdxFreeSlot() để lấy vị trí của ô trống có index nhỏ nhất trong bảng file (skip id 0 1 của stdin stdout, bắt đầu tìm từ id 2). Nếu không còn chỗ trống sẽ trả về -1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Thêm FileSystem::~FileSystem() để deallocate bảng file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	- Sửa lại method FileSystem::Remove(): tìm file theo tên rồi deallocate khỏi bảng file, gán ô thành NULL (đánh dấu đó là ô trống)
+========================================================
+- CreateFile:
+	Error khi 1 trong những điều sau xảy ra:
+		File name trống (độ dài bằng 0)
+		Không thể chuyển từ user memory space sang system memory space (hết bộ nhớ)
+========================================================
+- OpenF:
+	Trước khi mở file, kiểm tra bảng file có còn trống không. Nếu trống thì mở (rồi return OpenFileID, cũng là index của OpenFile trong bảng file index), nếu không thì trả về lỗi báo cho người dùng (return -1). Ngoài type = 0 = 1 thì type = 2 là stdin, = 3 là stdout. Type này phải do người dùng truyền vào. Nếu tên file là "stdin" mà sai type != 2 thì cũng không thể mở console input. Nếu type = 2 hoặc 3 thì sẽ tự động mở console tương ứng mà không check tới tên
+========================================================
+- CloseF: check xem ID phải 0 1 không (stdin stdout). Nếu phải thì không cho đóng file, trả về luôn -1. Không thì check xem file còn mở không (file_table[id] == NULL hay không). Nếu còn mở thì đóng lại (trả về 0), nếu đã đóng thì không đóng được nữa, báo lỗi (trả về -1)
+========================================================
+- ReadF: check xem file có mở không (file_table[id] == NULL hay không). Nếu bằng thì file chưa mở (lỗi), trả về -1. Nếu không thì check tiếp xem có đang ở EOF không. Nếu EOF thì gán buffer bằng null (không có gì để đọc) và trả về -2. Nếu không phải EOF thì đọc cho tới khi hết charcount hoặc cho tới khi gặp EOF (điều kiện nào gặp trước thì dừng ở đó). Trả về số kí tự đọc được = min(charcount, remaining_characters)
+========================================================
+- WriteF: check xem file có mở không (file_table[id] == NULL hay không). Không thì lỗi, trả về -1. Nếu phải thì check tiếp file có quyền write không (type = 0 thì được ghi). Nếu không thì trả về -1. Nếu có quyền ghi thì ghi. Nếu ghi lỗi (do hết bộ nhớ, v.v) thì trả về -1;
