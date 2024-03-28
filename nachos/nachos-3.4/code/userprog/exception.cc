@@ -126,7 +126,6 @@ void handle_SC_ReadInt() {
 	int MAX_BUFFER = 255;
 	buffer = new char[MAX_BUFFER + 1];
 	int numbytes = gSynchConsole->Read(buffer, MAX_BUFFER); // Read the buffer char string and return it <= MAX_BUFFER (of course)
-	printf("numbytes: %d", numbytes);
 	// using gSynchConsole from system.h: access between console and users.
 	int number = 0; // Answer (if any)
 			
@@ -153,12 +152,12 @@ void handle_SC_ReadInt() {
 	    	{
 			if (buffer[j] != '0') // Indicating this is a float
 			{
-		    	printf("\n\n The integer number is not valid");
-		    	DEBUG('a', "\n The integer number is not valid");
+		    	printf("\n\n The integer number is not valid \n");
+		    	DEBUG('a', "\n The integer number is not valid \n");
 		    	machine->WriteRegister(2, 0);
 				delete buffer;
-				IncrementR();
-				interrupt->Halt();
+				//IncrementR();
+				//interrupt->Halt();
                 return;
 			}
 	    	}
@@ -168,12 +167,12 @@ void handle_SC_ReadInt() {
 		}
 		else if (buffer[i] < '0' && buffer[i] > '9')
 		{
-	    	printf("\n\n The integer number is not valid");
-	    	DEBUG('a', "\n The integer number is not valid");
+	    	printf("\n\n The integer number is not valid \n");
+	    	DEBUG('a', "\n The integer number is not valid \n");
 	    	machine->WriteRegister(2, 0);
 			delete buffer;
-			IncrementR();
-			interrupt->Halt(); // Halt() because of invalid input
+			//IncrementR();
+			//interrupt->Halt(); // Halt() because of invalid input
 			return;
 		}
 		lastIndex = i;    
@@ -192,9 +191,7 @@ void handle_SC_ReadInt() {
 	}
 	machine->WriteRegister(2, number); // Record the final number into r2 (result)
 	delete buffer; // For memory perserverance purpose
-	IncrementR();
 	// No Halt() because of successful input (to continue the program)
-	return; 
 }
 
 void handle_SC_PrintInt() {
@@ -204,7 +201,7 @@ void handle_SC_PrintInt() {
 	if (number == 0) 
 	{
 		gSynchConsole->Write("0", 1); // print 0
-		IncrementR();
+		//IncrementR();
         return;     
 	}
 	
@@ -243,14 +240,12 @@ void handle_SC_PrintInt() {
 		buffer[numLength + 1] = 0;
 		gSynchConsole->Write(buffer, numLength + 1); // +1 to counter for the '-' 
 		delete buffer;
-		IncrementR();
+		//IncrementR();
         return; 
 	}
 	buffer[numLength] = 0;	
 	gSynchConsole->Write(buffer, numLength);
-	delete buffer;
-	IncrementR();
-    return;        
+	delete buffer;       
 }
 
 
@@ -286,24 +281,24 @@ void handle_SC_ReadFloat() {
         {
             dotCount++;
             if (dotCount > 1) { // More than one dot is invalid
-                printf("\n\n The number is not a valid float");
-                DEBUG('a', "\n The number is not a valid float");
+                printf("\n\n The number is not a valid float \n");
+                DEBUG('a', "\n The number is not a valid float \n");
                 machine->WriteRegister(2, 0);
                 delete buffer;
-                IncrementR();
-				interrupt->Halt();
+                //IncrementR();
+				//interrupt->Halt();
         		return; 
             }
             //lastIndex = i - 1; // commented out because we want to allow for trailing zeroes
         }
         else if ((buffer[i] < '0' || buffer[i] > '9') && buffer[i] != '-') // Allow digits and negative sign
         {
-            printf("\n\n The number is not a valid float");
-            DEBUG('a', "\n The number is not a valid float");
+            printf("\n\n The number is not a valid float \n");
+            DEBUG('a', "\n The number is not a valid float \n");
             machine->WriteRegister(2, 0);
             delete buffer;
-            IncrementR();
-			interrupt->Halt();
+            //IncrementR();
+			//interrupt->Halt();
         	return; 
         }
         lastIndex = i;    
@@ -327,9 +322,7 @@ void handle_SC_ReadFloat() {
         number *= -1.0f;
     }
     machine->WriteRegister(2, number); // Record the final number into f2 (result)
-    delete buffer; // For memory preservation purpose
-    IncrementR();
-    return;      
+    delete buffer; // For memory preservation purpose   
 }
 
 void handle_SC_PrintFloat() {
@@ -337,8 +330,9 @@ void handle_SC_PrintFloat() {
     // Output: Print ONE float onto the Console
     float number = machine->ReadRegister(4);
     if (number == 0.0f) {
+		printf("\nOutput: \n");
         gSynchConsole->Write("0.0", 3); // print 0.0
-        IncrementR();
+        //IncrementR();
         return;   
     }
 
@@ -405,10 +399,9 @@ void handle_SC_PrintFloat() {
     }
 
     // Print the buffer to console
+	printf("\nOutput: \n");
     gSynchConsole->Write(buffer, totalLength);
     delete[] buffer;
-    IncrementR();
-	return;
 }
 
 void handle_SC_ReadChar() {
@@ -420,18 +413,18 @@ void handle_SC_ReadChar() {
 
 	if(numBytes > 1) // Not valid if >1 char
 	{
-		printf("\n\n Only one character allowed");
-		DEBUG('a', "\n Only one character allowed");
+		printf("\n\n Only one character allowed \n");
+		DEBUG('a', "\n Only one character allowed \n");
 		machine->WriteRegister(2, 0);
-		interrupt->Halt();
+		//interrupt->Halt();
 		return;
 	}
 	else if(numBytes == 0) // Empty
 	{
-		printf("\n\n Empty input");
-		DEBUG('a', "\n Empty input");
+		printf("\n\n Empty input \n");
+		DEBUG('a', "\n Empty input \n");
 		machine->WriteRegister(2, 0);
-		interrupt->Halt();
+		//interrupt->Halt();
 		return;
 	}
 	else
@@ -441,17 +434,14 @@ void handle_SC_ReadChar() {
 		machine->WriteRegister(2, c);
 	}
 	delete buffer;
-	IncrementR();
-	return;
 }
 
 void handle_SC_PrintChar() {
 	// Input: ONE char, retrieved from f4 using machine->ReadRegisterF(4).
 	// Output: Print ONE char onto the Console
 	char c = (char)machine->ReadRegister(4);
+	printf("\nOutput: \n");
 	gSynchConsole->Write(&c, 1); // 1 byte
-	IncrementR();
-	return;
 }
 
 void handle_SC_ReadString() {
@@ -467,8 +457,6 @@ void handle_SC_ReadString() {
 	gSynchConsole->Read(buffer, length); // Read it (duh)
 	System2User(virtAddr, length, buffer); // Copy it back to User Space
 	delete buffer; 
-	IncrementR();
-	return;	
 }
 
 void handle_SC_PrintString() {
@@ -477,15 +465,15 @@ void handle_SC_PrintString() {
 	int virtAddr;
 	char* buffer;
 	virtAddr = machine->ReadRegister(4); // Get address of the buffer in User Space, retrieved from r4
+
 	buffer = User2System(virtAddr, 255); // Copy string from User Space to System Space
 	int length = 0; // Length of the string (default 0)
 	while (buffer[length] != 0) {
 		length++; // Count the length of the string
 	}
+	printf("\nOutput: \n");
 	gSynchConsole->Write(buffer, length + 1); // Write the string to the Console (length + 1 for the null terminator)
 	delete buffer; 
-	IncrementR();
-	return;	
 }
 
 void handle_SC_CreateFile() {
@@ -663,29 +651,53 @@ void ExceptionHandler(ExceptionType which) {
 					break;
 				}
 				case SC_ReadInt:
+				{
 					handle_SC_ReadInt();
+					IncrementR();
 					break;
+				}
 				case SC_PrintInt:
+				{
 					handle_SC_PrintInt();
+					IncrementR();
 					break;
+				}
 				case SC_ReadFloat:
+				{
 					handle_SC_ReadFloat();
+					IncrementR();
 					break;
+				}
 				case SC_PrintFloat:
+				{
 					handle_SC_PrintFloat();
+					IncrementR();
 					break;
+				}
 				case SC_ReadChar:
+				{
 					handle_SC_ReadChar();
+					IncrementR();
 					break;
+				}
 				case SC_PrintChar:
+				{
 					handle_SC_PrintChar();
+					IncrementR();
 					break;
+				}
 				case SC_ReadString:
+				{
 					handle_SC_ReadString();
+					IncrementR();
 					break;
+				}
 				case SC_PrintString:
+				{
 					handle_SC_PrintString();
-					break;		
+					IncrementR();
+					break;
+				}		
 			}
 	}
 }
