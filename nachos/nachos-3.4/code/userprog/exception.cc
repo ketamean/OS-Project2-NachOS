@@ -152,7 +152,7 @@ void handle_SC_ReadInt() {
 	    	{
 			if (buffer[j] != '0') // Indicating this is a float
 			{
-		    	printf("\n\n The integer number is not valid \n");
+		    	printf("\n The integer number is not valid \n");
 		    	DEBUG('a', "\n The integer number is not valid \n");
 		    	machine->WriteRegister(2, 0);
 				delete buffer;
@@ -167,7 +167,7 @@ void handle_SC_ReadInt() {
 		}
 		else if (buffer[i] < '0' && buffer[i] > '9')
 		{
-	    	printf("\n\n The integer number is not valid \n");
+	    	printf("\n The integer number is not valid \n");
 	    	DEBUG('a', "\n The integer number is not valid \n");
 	    	machine->WriteRegister(2, 0);
 			delete buffer;
@@ -192,6 +192,7 @@ void handle_SC_ReadInt() {
 	machine->WriteRegister(2, number); // Record the final number into r2 (result)
 	delete buffer; // For memory perserverance purpose
 	// No Halt() because of successful input (to continue the program)
+	return;
 }
 
 void handle_SC_PrintInt() {
@@ -246,6 +247,7 @@ void handle_SC_PrintInt() {
 	buffer[numLength] = 0;	
 	gSynchConsole->Write(buffer, numLength);
 	delete buffer;       
+	return;
 }
 
 
@@ -323,6 +325,7 @@ void handle_SC_ReadFloat() {
     }
     machine->WriteRegister(2, number); // Record the final number into f2 (result)
     delete buffer; // For memory preservation purpose   
+	return;
 }
 
 void handle_SC_PrintFloat() {
@@ -402,6 +405,7 @@ void handle_SC_PrintFloat() {
 	printf("\nOutput: \n");
     gSynchConsole->Write(buffer, totalLength);
     delete[] buffer;
+	return;
 }
 
 void handle_SC_ReadChar() {
@@ -416,16 +420,12 @@ void handle_SC_ReadChar() {
 		printf("\n\n Only one character allowed \n");
 		DEBUG('a', "\n Only one character allowed \n");
 		machine->WriteRegister(2, 0);
-		//interrupt->Halt();
-		return;
 	}
 	else if(numBytes == 0) // Empty
 	{
 		printf("\n\n Empty input \n");
 		DEBUG('a', "\n Empty input \n");
 		machine->WriteRegister(2, 0);
-		//interrupt->Halt();
-		return;
 	}
 	else
 	{
@@ -457,6 +457,7 @@ void handle_SC_ReadString() {
 	gSynchConsole->Read(buffer, length); // Read it (duh)
 	System2User(virtAddr, length, buffer); // Copy it back to User Space
 	delete buffer; 
+	return;
 }
 
 void handle_SC_PrintString() {
@@ -474,6 +475,7 @@ void handle_SC_PrintString() {
 	printf("\nOutput: \n");
 	gSynchConsole->Write(buffer, length + 1); // Write the string to the Console (length + 1 for the null terminator)
 	delete buffer; 
+	return;
 }
 
 void handle_SC_CreateFile() {
@@ -586,8 +588,8 @@ void ExceptionHandler(ExceptionType which) {
 				case SC_Halt:
 				// Input: None
 				// Output: System Shutdown Call
-				DEBUG('a', "\nShutdown, initiated by user program. ");
-				printf("\nShutdown, initiated by user program. ");
+				DEBUG('a', "\n Shutdown, initiated by user program. ");
+				printf("\n Shutdown, initiated by user program. ");
 				interrupt->Halt();
 				return;
 
