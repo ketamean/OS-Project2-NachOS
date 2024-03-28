@@ -119,6 +119,7 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 void handle_SC_ReadInt() {
 	// Input: Keyboard
 	// Output: Write answer into r2
+	printf("\nInput: ");
 	char* buffer;
 	int MAX_BUFFER = 255;
 	buffer = new char[MAX_BUFFER + 1];
@@ -198,6 +199,7 @@ void handle_SC_PrintInt() {
 	int number = machine->ReadRegister(4); 
 	if (number == 0) 
 	{
+		printf("\nOutput: \n");
 		gSynchConsole->Write("0", 1); // print 0
 		//IncrementR();
         return;     
@@ -236,12 +238,14 @@ void handle_SC_PrintInt() {
 	{
 		buffer[0] = '-';
 		buffer[numLength + 1] = 0;
+		printf("\nOutput: \n");
 		gSynchConsole->Write(buffer, numLength + 1); // +1 to counter for the '-' 
 		delete buffer;
 		//IncrementR();
         return; 
 	}
 	buffer[numLength] = 0;	
+	printf("\nOutput: \n");
 	gSynchConsole->Write(buffer, numLength);
 	delete buffer;       
 	return;
@@ -252,6 +256,7 @@ void handle_SC_PrintInt() {
 void handle_SC_ReadFloat() {
     // Input: Keyboard
     // Output: Write answer into r2
+	printf("\nInput: ");
     char* buffer;
     int MAX_BUFFER = 255;
     buffer = new char[MAX_BUFFER + 1];
@@ -284,8 +289,8 @@ void handle_SC_ReadFloat() {
                 DEBUG('a', "\n The number is not a valid float \n");
                 machine->WriteRegister(2, 0);
                 delete buffer;
-                IncrementR();
-				interrupt->Halt();
+                //IncrementR();
+				//interrupt->Halt();
         		return; 
             }
             //lastIndex = i - 1; // commented out because we want to allow for trailing zeroes
@@ -296,8 +301,8 @@ void handle_SC_ReadFloat() {
             DEBUG('a', "\n The number is not a valid float \n");
             machine->WriteRegister(2, 0);
             delete buffer;
-            IncrementR();
-			interrupt->Halt();
+            //IncrementR();
+			//interrupt->Halt();
         	return; 
         }
         lastIndex = i;    
@@ -320,19 +325,19 @@ void handle_SC_ReadFloat() {
     {
         number *= -1.0f;
     }
-    machine->WriteRegister(2, number); // Record the final number into f2 (result)
+    machine->WriteRegister(2, number); // Record the final number into r2 (result)
     delete buffer; // For memory preservation purpose   
 	return;
 }
 
 void handle_SC_PrintFloat() {
-    // Input: ONE float, retrieved from f4 using machine->ReadRegisterF(4).
+    // Input: ONE float, retrieved from r4 using machine->ReadRegister(4).
     // Output: Print ONE float onto the Console
     float number = machine->ReadRegister(4);
     if (number == 0.0f) {
 		printf("\nOutput: \n");
-        gSynchConsole->Write("0.0", 3); // print 0.0
-        IncrementR();
+        gSynchConsole->Write("0.0", 3); // print 0.0, the 3 is the number of bytes to write
+        //IncrementR();
         return;   
     }
 
@@ -716,6 +721,8 @@ void ExceptionHandler(ExceptionType which) {
 
 	switch (which) {
 		case NoException:
+			DEBUG('a', "\n No Exception");
+			printf("\n\n No Exception");
 			return;
 
 		case PageFaultException:
@@ -723,6 +730,43 @@ void ExceptionHandler(ExceptionType which) {
 			printf("\n\n No valid translation found");
 			interrupt->Halt();
 			break;
+		
+		case ReadOnlyException:
+			DEBUG('a', "\n Write attempted to page read-only");
+			printf("\n\n Write attempted to page read-only");
+			interrupt->Halt();
+			break;
+		
+		case BusErrorException:
+			DEBUG('a', "\n Translation resulted in an invalid physical address");
+			printf("\n\n Translation resulted in an invalid physical address");
+			interrupt->Halt();
+			break;
+
+		case AddressErrorException:
+			DEBUG('a', "\n Unaligned reference or one that was beyond the end of the address space");
+			printf("\n\n Unaligned reference or one that was beyond the end of the address space");
+			interrupt->Halt();
+			break;
+		
+		case OverflowException:
+			DEBUG('a', "\n Integer overflow in add or sub.");
+			printf("\n\n Integer overflow in add or sub.");
+			interrupt->Halt();
+			break;
+		
+		case IllegalInstrException:
+			DEBUG('a', "\n Unimplemented or reserved instr.");
+			printf("\n\n Unimplemented or reserved instr.");
+			interrupt->Halt();
+			break;
+
+		case NumExceptionTypes:
+			DEBUG('a', "\n Number Exceptions");
+			printf("\n\n Number Exception");
+			interrupt->Halt();
+			break;
+
 		case SyscallException:
 			switch(type) {
 
@@ -814,5 +858,11 @@ void ExceptionHandler(ExceptionType which) {
 					break;
 				}		
 			}
+		default:
+			DEBUG('a', "\n Strange Exception");
+			printf("\n\n Strange Exception");
+			interrupt->Halt();
+			break;
 	}
+	
 }
