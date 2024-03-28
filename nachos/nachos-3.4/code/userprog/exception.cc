@@ -287,8 +287,8 @@ void handle_SC_ReadFloat() {
                 DEBUG('a', "\n The number is not a valid float \n");
                 machine->WriteRegister(2, 0);
                 delete buffer;
-                //IncrementR();
-				//interrupt->Halt();
+                IncrementR();
+				interrupt->Halt();
         		return; 
             }
             //lastIndex = i - 1; // commented out because we want to allow for trailing zeroes
@@ -299,8 +299,8 @@ void handle_SC_ReadFloat() {
             DEBUG('a', "\n The number is not a valid float \n");
             machine->WriteRegister(2, 0);
             delete buffer;
-            //IncrementR();
-			//interrupt->Halt();
+            IncrementR();
+			interrupt->Halt();
         	return; 
         }
         lastIndex = i;    
@@ -335,7 +335,7 @@ void handle_SC_PrintFloat() {
     if (number == 0.0f) {
 		printf("\nOutput: \n");
         gSynchConsole->Write("0.0", 3); // print 0.0
-        //IncrementR();
+        IncrementR();
         return;   
     }
 
@@ -509,7 +509,7 @@ void handle_SC_CreateFile() {
 	// args: filename = fname, initialSize = 0
 	
 	if (succ == -1) {
-		printf("There is no memory space for new file.\n");
+		printf("Cannot create new file.\n");
 		machine->WriteRegister(2, -1); 	// error
 	}
 	printf("Finish creating file: <%s>\n", fname);
@@ -518,17 +518,91 @@ void handle_SC_CreateFile() {
 }
 
 void handle_SC_ReadFile() {
-    
-} 
+// Input:
+//		Reg 4: address of the result buffer in user memory space
+//		Reg 5: number of characters to be read
+//		Reg 6: OpenFileID (or index of OpenFile* in file_table)
+// Output:
+//		Reg 2: OpenFileID which is the index of the opening file in the file table, in range [0,9] (10 files in total); or -1 if an error occurs
+	int virtualAddress = machine->ReadRegister(4);
+	int charcount = machine->ReadRegister(5);
+	int fileid = machine->ReadRegister(6);
+	char* buffer = 0;
+	int nbytes;
+	OpenFile* f = 0;
+	if (fileid == 0) {
+		// stdin, fileSystem->file_table[fileid]->type == 2
+		printf("Read stdin.\n");
+		nbytes = gSynchConsole->Read(buffer, charcount);
+	} else if (fileid == 1) {
+		// stdout, fileSystem->file_table[fileid]->type == 3
+		printf("Cannot read stdout.\n");
+		machine->WriteRegister(2, -1);	// failed
+		return;
+	} else if (fileid < 0 || fileid >= N_FILES_IN_TABLE) {
+		// id out of range
+		printf("File ID out of range.\n");
+		machine->WriteRegister(2, -1);	// failed
+		return;
+	} else if (!fileSystem->file_table[fileid]) {
+		printf("File does not exist.\n");
+		machine->WriteRegister(2, -1);	// failed
+		return;
+	} else {
+		f = fileSystem->file_table[fileid];
+		nbytes = f->ReadAt(buffer, charcount, f->CurPos());
+	}
+	// check EOF
+	if (nbytes == 0) {
+		machine->WriteRegister(2, -2);
+		printf("Read file <%d>: EOF\n", fileid);
+		if (f)	f->CurPos() = 0;
+	} else {
+		machine->WriteRegister(2, nbytes);
+	}
 
+	System2User(virtualAddress, nbytes, buffer);
+	if (buffer)
+		printf("Read file with id <%d>, content: %s\n", fileid, buffer);
+		delete[] buffer;
+	// gSynchConsole->Read(buffer, len);
+	// gSynchConsole->Write(buffer, len + 1); // + 1 for null terminator
+}
 
 void handle_SC_WriteFile() {
     
 }
 
-
 void handle_SC_CloseFile() {
-    
+// Input:
+//		Reg 4: OpenFileID of the file to be closed
+// Output:
+//		Reg 2: OpenFileID which is the index of the opening file in the file table, in range [0,9] (10 files in total); or -1 if an error occurs
+    OpenFileId fileid = machine->ReadRegister(4);
+	if (fileid == 0) {
+		printf("Cannot close stdin.\n");
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	} else if (fileid == 1) {
+		printf("Cannot close stdout.\n");
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	} else if (fileid >= N_FILES_IN_TABLE) {
+		printf("File ID must be in range [0; %d)\n", N_FILES_IN_TABLE);
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	}
+
+	OpenFile* f = fileSystem->file_table[fileid];
+	if (!f) {
+		printf("The chosen file is not currently opened.\n");
+		machine->WriteRegister(2, -1);
+		return;
+	} // else
+	delete f;
+	fileSystem->file_table[fileid] = NULL;
+	printf("File is closed with ID <%d>\n", fileid);
+	machine->WriteRegister(2, 0);
 }
 
 
@@ -540,15 +614,7 @@ void handle_SC_OpenFile() {
 //		Reg 2: OpenFileID which is the index of the opening file in the file table, in range [0,9] (10 files in total); or -1 if an error occurs
 	int virAddr_name = machine->ReadRegister(4);
 	int type = machine->ReadRegister(5);
-	if (type == 2) {
-		machine->WriteRegister(2, 0);
-		printf("Open stdin.\n");
-		return;
-	} else if (type == 3) {
-		machine->WriteRegister(2, 1);
-		printf("Open stdout.\n");
-		return;
-	} else if (type != 0 && type != 1) {
+	if (type != 0 && type != 1 && type != 2 && type != 3) {
 		printf("OpenF: wrong type\n");
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
@@ -557,6 +623,24 @@ void handle_SC_OpenFile() {
 	if (!fname) {
 		printf("Invalid file name: %s\n", fname);
 		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	} else if (strcmp(fname, "stdin") == 0 || type == 2) {
+		if (strcmp(fname, "stdin") == 0 && type == 2) {
+			machine->WriteRegister(2, 0);
+			printf("Open stdin.\n");
+		} else {
+			printf("File <%s> cannot be opened with type 2", fname);
+			machine->WriteRegister(2, -1);
+		}
+		return;
+	} else if (strcmp(fname, "stdout") == 0 || type == 3) {
+		if (strcmp(fname, "stdout") == 0 && type == 3) {
+			machine->WriteRegister(2, 1);
+			printf("Open stdout.\n");
+		} else {
+			printf("File <%s> cannot be opened with type 3", fname);
+			machine->WriteRegister(2, -1);
+		}
 		return;
 	}
 	int f = fileSystem->Open(fname, type);
