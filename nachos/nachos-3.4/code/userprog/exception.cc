@@ -550,6 +550,7 @@ void handle_SC_ReadFile() {
 		return;
 	} else {
 		f = fileSystem->file_table[fileid];
+		printf("File cursor position: %d", f->CurPos());
 		nbytes = f->ReadAt(buffer, charcount, f->CurPos());
 	}
 	// check EOF
