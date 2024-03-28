@@ -526,7 +526,7 @@ switch (which) {
 		case PageFaultException:
 			DEBUG('a', "\n No valid translation found");
 			printf("\n\n No valid translation found");
-			IncrementR();
+			interrupt->Halt();
 			break;
 		case SyscallException:
 			switch(type) {
@@ -536,7 +536,7 @@ switch (which) {
 			// Output: System Shutdown Call
 			DEBUG('a', "\nShutdown, initiated by user program. ");
 			printf("\nShutdown, initiated by user program. ");
-			IncrementR();
+			interrupt->Halt();
 			return;
 
 			case SC_CreateFile:
