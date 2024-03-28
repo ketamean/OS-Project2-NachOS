@@ -113,9 +113,6 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 	return i;
 }
 
-// max length of file name
-#define MAX_FILENAME_LEN 200
-
 
 /* --NOTICE: FOR MORE THAN ONE TASKS PERFORMANCE, REPLACE 'interrupt->Halt()' WITH A R INCREMENTER-- */
 
@@ -482,6 +479,12 @@ void handle_SC_PrintString() {
 	return;
 }
 
+// max length of file name
+#define MAX_FILENAME_LEN 200
+
+// max length of file content
+#define MAX_FILECONTENT_LEN 2000
+
 void handle_SC_CreateFile() {
 // Input:
 //		Reg 4: address of file name in user memory space
@@ -527,7 +530,7 @@ void handle_SC_ReadFile() {
 	int virtualAddress = machine->ReadRegister(4);
 	int charcount = machine->ReadRegister(5);
 	int fileid = machine->ReadRegister(6);
-	char* buffer = 0;
+	char* buffer = new char[MAX_FILECONTENT_LEN];
 	int nbytes;
 	OpenFile* f = 0;
 	if (fileid == 0) {
@@ -548,15 +551,19 @@ void handle_SC_ReadFile() {
 		printf("File does not exist.\n");
 		machine->WriteRegister(2, -1);	// failed
 		return;
+	} else if (fileSystem->file_table[fileid]->type != 0) {
+		printf("Do not have permission to write on that file: type == %d.\n", fileSystem->file_table[fileid]->type);
+		machine->WriteRegister(2, -1);	// failed
+		return;
 	} else {
 		f = fileSystem->file_table[fileid];
-		printf("File cursor position: %d", f->CurPos());
-		nbytes = f->ReadAt(buffer, charcount, f->CurPos());
+		// printf("File cursor position: %d", f->CurPos());
+		nbytes = f->Read(buffer, charcount);
 	}
 	// check EOF
 	if (nbytes == 0) {
 		machine->WriteRegister(2, -2);
-		printf("Read file <%d>: EOF\n", fileid);
+		// printf("Read file <%d>: EOF\n", fileid);
 		if (f)	f->CurPos() = 0;
 	} else {
 		machine->WriteRegister(2, nbytes);
@@ -564,14 +571,58 @@ void handle_SC_ReadFile() {
 
 	System2User(virtualAddress, nbytes, buffer);
 	if (buffer)
-		printf("Read file with id <%d>, content: %s\n", fileid, buffer);
+		// printf("Read file with id <%d>, content: %s\n", fileid, buffer);
 		delete[] buffer;
-	// gSynchConsole->Read(buffer, len);
-	// gSynchConsole->Write(buffer, len + 1); // + 1 for null terminator
 }
 
 void handle_SC_WriteFile() {
-    
+// Input:
+//		Reg 4: address of the result buffer in user memory space
+//		Reg 5: number of characters to be read
+//		Reg 6: OpenFileID (or index of OpenFile* in file_table)
+// Output:
+//		Reg 2: OpenFileID which is the index of the opening file in the file table, in range [0,9] (10 files in total); or -1 if an error occurs
+	int virtualAddress = machine->ReadRegister(4);
+	int charcount = machine->ReadRegister(5);
+	int fileid = machine->ReadRegister(6);
+	char* buffer = User2System(virtualAddress, charcount);
+	int nbytes;
+	OpenFile* f = 0;
+
+	if (fileid == 0) {
+		// stdin, fileSystem->file_table[fileid]->type == 2
+		printf("Cannot write to stdin.\n");
+		machine->WriteRegister(2, -1);	// failed
+		return;
+	} else if (fileid == 1) {
+		// stdout, fileSystem->file_table[fileid]->type == 3
+		printf("Write to stdout.\n");
+		nbytes = gSynchConsole->Write(buffer, charcount + 1); // + 1 for null terminator
+	} else if (fileid < 0 || fileid >= N_FILES_IN_TABLE) {
+		// id out of range
+		printf("File ID out of range.\n");
+		machine->WriteRegister(2, -1);	// failed
+		return;
+	} else if (!fileSystem->file_table[fileid]) {
+		printf("File does not exist.\n");
+		machine->WriteRegister(2, -1);	// failed
+		return;
+	} else {
+		f = fileSystem->file_table[fileid];
+		nbytes = f->Write(buffer, min(charcount + 1, strlen(buffer))); // + 1 for null terminator
+	}
+
+	// check EOF
+	if (nbytes == 0) {
+		machine->WriteRegister(2, -2);
+		// printf("Read file <%d>: EOF\n", fileid);
+		if (f)	f->CurPos() = 0;
+	} else {
+		machine->WriteRegister(2, nbytes);
+	}
+	if (buffer)
+		// printf("Read file with id <%d>, content: %s\n", fileid, buffer);
+		delete[] buffer;
 }
 
 void handle_SC_CloseFile() {
@@ -588,7 +639,7 @@ void handle_SC_CloseFile() {
 		printf("Cannot close stdout.\n");
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
-	} else if (fileid >= N_FILES_IN_TABLE) {
+	} else if (fileid < 0 || fileid >= N_FILES_IN_TABLE) {
 		printf("File ID must be in range [0; %d)\n", N_FILES_IN_TABLE);
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
@@ -622,6 +673,7 @@ void handle_SC_OpenFile() {
 	}
 	char* fname = User2System(virAddr_name, MAX_FILENAME_LEN);
 	if (!fname) {
+
 		printf("Invalid file name: %s\n", fname);
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
