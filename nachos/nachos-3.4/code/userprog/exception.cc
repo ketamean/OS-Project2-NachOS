@@ -420,12 +420,14 @@ void handle_SC_ReadChar() {
 		printf("\n\n Only one character allowed \n");
 		DEBUG('a', "\n Only one character allowed \n");
 		machine->WriteRegister(2, 0);
+		interrupt->Halt();
 	}
 	else if(numBytes == 0) // Empty
 	{
 		printf("\n\n Empty input \n");
 		DEBUG('a', "\n Empty input \n");
 		machine->WriteRegister(2, 0);
+		interrupt->Halt();
 	}
 	else
 	{
@@ -434,6 +436,7 @@ void handle_SC_ReadChar() {
 		machine->WriteRegister(2, c);
 	}
 	delete buffer;
+	return;
 }
 
 void handle_SC_PrintChar() {
@@ -442,6 +445,7 @@ void handle_SC_PrintChar() {
 	char c = (char)machine->ReadRegister(4);
 	printf("\nOutput: \n");
 	gSynchConsole->Write(&c, 1); // 1 byte
+	return;
 }
 
 void handle_SC_ReadString() {

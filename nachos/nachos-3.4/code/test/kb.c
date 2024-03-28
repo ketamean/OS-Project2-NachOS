@@ -10,8 +10,9 @@ int main() {
 	//char c = ReadChar();
 	//PrintChar(c);
 
+	//int legth;
 	//char s[255];
-	//int length = ReadInt();
+	//length = ReadInt();
 	//ReadString(s, length);
 	//PrintString(s);
 
