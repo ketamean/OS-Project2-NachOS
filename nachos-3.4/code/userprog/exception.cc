@@ -49,7 +49,12 @@
 
 /* R INCREMENT COUNTER */
 
-// ADDED SO THAT I CAN RUN 2 PROCESS (READ__ AND PRINT__) AT THE SAME TIME
+// ADDED SO THAT I CAN RUN PROCESSES (EX: READ__ AND PRINT__) ONE AFTER ANOTHER
+// WITHOUT HAVING TO RESTART THE PROGRAM
+// How to use: IncrementR() after each syscall to increment the R counter, allowing the program to continue.
+// Only use this if you want to run multiple syscalls in a row. If you only want to run one syscall, you don't need to use this.
+// Or: when there is an error, use this to increment the R counter before calling interrupt->Halt() to prevent the program from stopping.
+// Else: not desired, just call interrupt->Halt() to stop the program.
 void IncrementR()
 {
 	int counter = machine->ReadRegister(PCReg);
