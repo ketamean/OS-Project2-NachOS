@@ -8,10 +8,11 @@ int main() {
 	////////////////////////////////
     int id1;
     int id2;
+    char* buffer;
     id1 = OpenF(name, 0);
     id2 = OpenF("stdin", 2);
     ////////////////////////////////
-    char* buffer;
+    
 	ReadF(buffer, 10, id1);
 	////////////////////////////////
 
