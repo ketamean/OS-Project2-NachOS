@@ -153,6 +153,22 @@ PrintInt:
 	j	$31
 	.end PrintInt
 
+	.globl ReadFloat
+	.ent	ReadFloat	
+ReadFloat:
+	addiu $2,$0,SC_ReadFloat 
+	syscall
+	j	$31
+	.end ReadFLoat
+
+	.globl PrintFloat
+	.ent	PrintFloat
+PrintFloat:
+	addiu $2,$0,SC_PrintFloat
+	syscall
+	j	$31
+	.end PrintFloat
+
 	.globl ReadChar
 	.ent	ReadChar
 ReadChar:
@@ -169,37 +185,61 @@ PrintChar:
 	j	$31
 	.end PrintChar
 
-	.globl Open
-	.ent	Open
-Open:
-	addiu $2,$0,SC_Open
+	.globl ReadString
+	.ent	ReadString
+ReadString:
+	addiu $2,$0,SC_ReadString
 	syscall
 	j	$31
-	.end Open
+	.end ReadString
 
-	.globl Close
-	.ent	Close
-Close:
-	addiu $2,$0,SC_Close
+	.globl PrintString
+	.ent	PrintString
+PrintString:
+	addiu $2,$0,SC_PrintString
 	syscall
 	j	$31
-	.end Close
+	.end PrintString
 
-	.globl Read
-	.ent	Read
-Read:
-	addiu $2,$0,SC_Read
+	.globl CreateFile
+	.ent	CreateFile
+CreateFile:
+	addiu $2,$0,SC_CreateFile
 	syscall
 	j	$31
-	.end Read
+	.end CreateFile
 
-	.globl Write
-	.ent	Write
-Write:
-	addiu $2,$0,SC_Write
+	.globl OpenFile
+	.ent	OpenFIle
+OpenFile:
+	addiu $2,$0,SC_OpenFile
 	syscall
 	j	$31
-	.end Write
+	.end OpenFile
+
+	.globl CloseFile
+	.ent	CloseFile
+CloseFile:
+	addiu $2,$0,SC_CloseFile
+	syscall
+	j	$31
+	.end CloseFile
+
+	.globl ReadFile
+	.ent	ReadFile
+ReadFile:
+	addiu $2,$0,SC_ReadFile
+	syscall
+	j	$31
+	.end ReadFile
+
+	.globl WriteFile
+	.ent	WriteFile
+WriteFile:
+	addiu $2,$0,SC_WriteFile
+	syscall
+	j	$31
+	.end WriteFile
 
 /* dummy function to keep gcc happy */
         .globl  __main

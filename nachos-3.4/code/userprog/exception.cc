@@ -24,7 +24,6 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
-
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -47,6 +46,18 @@
 //	"which" is the kind of exception.  The list of possible exceptions 
 //	are in machine.h.
 //----------------------------------------------------------------------
+
+/* R INCREMENT COUNTER */
+
+// ADDED SO THAT I CAN RUN 2 PROCESS (READ__ AND PRINT__) AT THE SAME TIME
+void IncrementR()
+{
+	int counter = machine->ReadRegister(PCReg);
+   	machine->WriteRegister(PrevPCReg, counter);
+    	counter = machine->ReadRegister(NextPCReg);
+    	machine->WriteRegister(PCReg, counter);
+   	machine->WriteRegister(NextPCReg, counter + 4);
+}
 
 
 /* USER SPACE AND KERNEL SPACE ALLOCATION */
@@ -109,6 +120,7 @@ void handle_SC_ReadInt() {
 	int MAX_BUFFER = 255;
 	buffer = new char[MAX_BUFFER + 1];
 	int numbytes = gSynchConsole->Read(buffer, MAX_BUFFER); // Read the buffer char string and return it <= MAX_BUFFER (of course)
+	printf("numbytes: %d", numbytes);
 	// using gSynchConsole from system.h: access between console and users.
 	int number = 0; // Answer (if any)
 			
@@ -138,9 +150,10 @@ void handle_SC_ReadInt() {
 		    	printf("\n\n The integer number is not valid");
 		    	DEBUG('a', "\n The integer number is not valid");
 		    	machine->WriteRegister(2, 0);
-		    	delete buffer;
+				delete buffer;
+				IncrementR();
 				interrupt->Halt();
-		    	return;
+                return;
 			}
 	    	}
 	    	// If passes the test of .000000
@@ -151,10 +164,11 @@ void handle_SC_ReadInt() {
 		{
 	    	printf("\n\n The integer number is not valid");
 	    	DEBUG('a', "\n The integer number is not valid");
-	    	machine->WriteRegister(2, 0);
-	    	delete buffer;
-			interrupt->Halt();
-	    	return;
+	    	machine->WriteRegister(2, 0)
+			delete buffer;
+			IncrementR();
+			interrupt->Halt(); // Halt() because of invalid input
+			return;
 		}
 		lastIndex = i;    
 	}			
@@ -172,8 +186,9 @@ void handle_SC_ReadInt() {
 	}
 	machine->WriteRegister(2, number); // Record the final number into r2 (result)
 	delete buffer; // For memory perserverance purpose
-	interrupt->Halt();
-	return;		
+	IncrementR();
+	// No Halt() because of successful input (to continue the program)
+	return; 
 }
 
 void handle_SC_PrintInt() {
@@ -183,8 +198,8 @@ void handle_SC_PrintInt() {
 	if (number == 0) 
 	{
 		gSynchConsole->Write("0", 1); // print 0
-		interrupt->Halt();
-		return;    
+		IncrementR();
+        return;     
 	}
 	
 	bool isNegative = false; 
@@ -222,14 +237,14 @@ void handle_SC_PrintInt() {
 		buffer[numLength + 1] = 0;
 		gSynchConsole->Write(buffer, numLength + 1); // +1 to counter for the '-' 
 		delete buffer;
-		interrupt->Halt();
-		return;
+		IncrementR();
+        return; 
 	}
 	buffer[numLength] = 0;	
 	gSynchConsole->Write(buffer, numLength);
 	delete buffer;
-	interrupt->Halt();
-	return;        
+	IncrementR();
+    return;        
 }
 
 
@@ -269,8 +284,9 @@ void handle_SC_ReadFloat() {
                 DEBUG('a', "\n The number is not a valid float");
                 machine->WriteRegister(2, 0);
                 delete buffer;
-                interrupt->Halt();
-                return;
+                IncrementR();
+				interrupt->Halt();
+        		return; 
             }
             //lastIndex = i - 1; // commented out because we want to allow for trailing zeroes
         }
@@ -280,8 +296,9 @@ void handle_SC_ReadFloat() {
             DEBUG('a', "\n The number is not a valid float");
             machine->WriteRegister(2, 0);
             delete buffer;
-            interrupt->Halt();
-            return;
+            IncrementR();
+			interrupt->Halt();
+        	return; 
         }
         lastIndex = i;    
     }           
@@ -303,20 +320,20 @@ void handle_SC_ReadFloat() {
     {
         number *= -1.0f;
     }
-    machine->WriteRegisterF(2, number); // Record the final number into f2 (result)
+    machine->WriteRegister(2, number); // Record the final number into f2 (result)
     delete buffer; // For memory preservation purpose
-    interrupt->Halt();
-    return;     
+    IncrementR();
+    return;      
 }
 
 void handle_SC_PrintFloat() {
     // Input: ONE float, retrieved from f4 using machine->ReadRegisterF(4).
     // Output: Print ONE float onto the Console
-    float number = machine->ReadRegisterF(4);
+    float number = machine->ReadRegister(4);
     if (number == 0.0f) {
         gSynchConsole->Write("0.0", 3); // print 0.0
-        interrupt->Halt();
-        return;
+        IncrementR();
+        return;   
     }
 
     bool isNegative = false;
@@ -384,7 +401,7 @@ void handle_SC_PrintFloat() {
     // Print the buffer to console
     gSynchConsole->Write(buffer, totalLength);
     delete[] buffer;
-    interrupt->Halt();
+    IncrementR();
 	return;
 }
 
@@ -400,12 +417,16 @@ void handle_SC_ReadChar() {
 		printf("\n\n Only one character allowed");
 		DEBUG('a', "\n Only one character allowed");
 		machine->WriteRegister(2, 0);
+		interrupt->Halt();
+		return;
 	}
 	else if(numBytes == 0) // Empty
 	{
 		printf("\n\n Empty input");
 		DEBUG('a', "\n Empty input");
 		machine->WriteRegister(2, 0);
+		interrupt->Halt();
+		return;
 	}
 	else
 	{
@@ -413,9 +434,8 @@ void handle_SC_ReadChar() {
 		char c = buffer[0];
 		machine->WriteRegister(2, c);
 	}
-
 	delete buffer;
-	interrupt->Halt();
+	IncrementR();
 	return;
 }
 
@@ -424,7 +444,7 @@ void handle_SC_PrintChar() {
 	// Output: Print ONE char onto the Console
 	char c = (char)machine->ReadRegister(4);
 	gSynchConsole->Write(&c, 1); // 1 byte
-	interrupt->Halt();
+	IncrementR();
 	return;
 }
 
@@ -441,7 +461,7 @@ void handle_SC_ReadString() {
 	gSynchConsole->Read(buffer, length); // Read it (duh)
 	System2User(virtAddr, length, buffer); // Copy it back to User Space
 	delete buffer; 
-	interrupt->Halt();
+	IncrementR();
 	return;	
 }
 
@@ -458,7 +478,7 @@ void handle_SC_PrintString() {
 	}
 	gSynchConsole->Write(buffer, length + 1); // Write the string to the Console (length + 1 for the null terminator)
 	delete buffer; 
-	interrupt->Halt();
+	IncrementR();
 	return;	
 }
 
@@ -467,21 +487,7 @@ void handle_SC_PrintString() {
 // Output:
 // 		Reg 2: 0 if success; otherwise, -1
 void handle_SC_CreateFile() {
-    int virtualAddr = machine->ReadRegister(4);
-	printf('Reading file name...\n');
-	char* fname = User2System(virtualAddr, MAX_FILENAME_LEN);
-	if (!fname) {
-		printf("Not enough memory in system!\n");
-		machine->WriteRegister(2, -1); 	// error
-		delete[] fname;
-		return;
-	}
 
-	printf("Finish reading file name.\n");
-	printf("File name: <%s>", fname);
-
-	machine->WriteRegister(2, 0);	// success
-	fileSystem->
 }
 
 void handle_SC_Read() {
@@ -520,56 +526,59 @@ switch (which) {
 		case PageFaultException:
 			DEBUG('a', "\n No valid translation found");
 			printf("\n\n No valid translation found");
-			interrupt->Halt();
+			IncrementR();
 			break;
 		case SyscallException:
 			switch(type) {
 
-				case SC_Halt:
-				// Input: None
-				// Output: System Shutdown Call
-				DEBUG('a', "\nShutdown, initiated by user program. ");
-				printf("\nShutdown, initiated by user program. ");
-				interrupt->Halt();
-				return;
+			case SC_Halt:
+			// Input: None
+			// Output: System Shutdown Call
+			DEBUG('a', "\nShutdown, initiated by user program. ");
+			printf("\nShutdown, initiated by user program. ");
+			IncrementR();
+			return;
 
 			case SC_CreateFile:
 			{
 				handle_SC_CreateFile();
 				break;
 			}
-
-
-    /* if ((which == SyscallException) && (type == SC_Halt)) {
-	DEBUG('a', "Shutdown, initiated by user program.\n");
-   	interrupt->Halt();
-    } else {
-	printf("Unexpected user mode exception %d %d\n", which, type);
-	ASSERT(FALSE);
-    } Old habit dies young*/
-				case SC_ReadInt:
-					handle_SC_ReadInt();
+				case SC_ReadInt: 
+			{
+					handle_SC_ReadInt(); 
+					break;
+			}	
 				case SC_PrintInt:
+			{
 					handle_SC_PrintInt();
+			}
 				case SC_ReadFloat:
+			{
 					handle_SC_ReadFloat();
+			}
 				case SC_PrintFloat:
+			{
 					handle_SC_PrintFloat();
+			}
 				case SC_ReadChar:
+			{
 					handle_SC_ReadChar();
+			}
 				case SC_PrintChar:
+			{
 					handle_SC_PrintChar();
+			}
 				case SC_ReadString:
+			{
 					handle_SC_ReadString();
+			}
 				case SC_PrintString:
-					handle_SC_PrintString();		
+			{
+					handle_SC_PrintString();	
+			}	
+
 			}		
 	}
-		/* if ((which == SyscallException) && (type == SC_Halt)) {
-		DEBUG('a', "Shutdown, initiated by user program.\n");
-		interrupt->Halt();
-		} else {
-		printf("Unexpected user mode exception %d %d\n", which, type);
-		ASSERT(FALSE);
-		} Old habit dies young*/
+}
 }
