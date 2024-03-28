@@ -4,16 +4,16 @@ int main() {
 	int answer = ReadInt();
 	PrintInt(answer);
 	
-	/* float f = ReadFloat();
-	PrintFloat(f); */
+	float f = ReadFloat();
+	PrintFloat(f);
 	
-	/* char c = ReadChar();
-	PrintChar(c); */
+	char c = ReadChar();
+	PrintChar(c);
 
-	/* char s[255];
+	char s[255];
 	int length = ReadInt();
 	ReadString(s, length);
-	PrintString(s); */
+	PrintString(s);
 
 	Halt();
 	return 0;

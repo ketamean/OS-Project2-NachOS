@@ -170,7 +170,7 @@ void handle_SC_ReadInt() {
 		{
 	    	printf("\n\n The integer number is not valid");
 	    	DEBUG('a', "\n The integer number is not valid");
-	    	machine->WriteRegister(2, 0)
+	    	machine->WriteRegister(2, 0);
 			delete buffer;
 			IncrementR();
 			interrupt->Halt(); // Halt() because of invalid input
@@ -509,7 +509,7 @@ void handle_SC_CreateFile() {
 	}
 
 	printf("Finish reading file name.\n");
-	printf("Creating file: <%s>...", fname);
+	printf("Creating file: <%s>...\n", fname);
 
 	int succ = fileSystem->Create(fname, 0);
 	// args: filename = fname, initialSize = 0
@@ -518,7 +518,7 @@ void handle_SC_CreateFile() {
 		printf("There is no memory space for new file.\n");
 		machine->WriteRegister(2, -1); 	// error
 	}
-	printf("Finish creating file: <%s>", fname);
+	printf("Finish creating file: <%s>\n", fname);
 	machine->WriteRegister(2, 0);	// success
 	delete[] fname;
 }
@@ -555,14 +555,19 @@ void handle_SC_OpenFile() {
 		printf("Open stdout.\n");
 		return;
 	} else if (type != 0 && type != 1) {
-		printf("OpenF: wrong type");
+		printf("OpenF: wrong type\n");
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
 	}
 	char* fname = User2System(virAddr_name, MAX_FILENAME_LEN);
+	if (!fname) {
+		printf("Invalid file name: %s\n", fname);
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	}
 	int f = fileSystem->Open(fname, type);
 	if (f == -1) {
-		printf("There is no space for opening new file.\n");
+		printf("Cannot open file %s\n", fname);
 		machine->WriteRegister(2, -1); 	// returns error
 		delete[] fname;
 		return;
