@@ -27,8 +27,9 @@ FileSystem  *fileSystem;
 SynchDisk   *synchDisk;
 #endif
 
-#ifdef USER_PROGRAM	// requires either FILESYS or FILESYS_STUB
-Machine *machine;	// user program memory and registers
+#ifdef USER_PROGRAM // requires either FILESYS or FILESYS_STUB
+Machine *machine; // user program memory and registers
+SynchConsole *gSynchConsole;
 #endif
 
 #ifdef NETWORK
@@ -148,7 +149,8 @@ Initialize(int argc, char **argv)
     CallOnUserAbort(Cleanup);			// if user hits ctl-C
     
 #ifdef USER_PROGRAM
-    machine = new Machine(debugUserProg);	// this must come first
+machine = new Machine(debugUserProg); // this must come first
+gSynchConsole = new SynchConsole();
 #endif
 
 #ifdef FILESYS
@@ -177,7 +179,8 @@ Cleanup()
 #endif
     
 #ifdef USER_PROGRAM
-    delete machine;
+delete machine;
+delete gSynchConsole;
 #endif
 
 #ifdef FILESYS_NEEDED

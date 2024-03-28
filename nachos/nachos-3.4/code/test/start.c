@@ -9,8 +9,8 @@
 #define IN_ASM
 #include "syscall.h"
 
-        .text   
-        .align  2
+    .text   
+    .align  2
 
 /* -------------------------------------------------------------
  * __start
@@ -169,11 +169,74 @@ WriteF:
 	syscall
 	j	$31
 	.end WriteF
+	.globl ReadInt
+	.ent	ReadInt	
+ReadInt:
+	addiu $2,$0,SC_ReadInt 
+	syscall
+	j	$31
+	.end ReadInt
 
+	.globl PrintInt
+	.ent	PrintInt
+PrintInt:
+	addiu $2,$0,SC_PrintInt
+	syscall
+	j	$31
+	.end PrintInt
+
+	.globl ReadFloat
+	.ent	ReadFloat	
+ReadFloat:
+	addiu $2,$0,SC_ReadFloat 
+	syscall
+	j	$31
+	.end ReadFLoat
+
+	.globl PrintFloat
+	.ent	PrintFloat
+PrintFloat:
+	addiu $2,$0,SC_PrintFloat
+	syscall
+	j	$31
+	.end PrintFloat
+
+	.globl ReadChar
+	.ent	ReadChar
+ReadChar:
+	addiu $2,$0,SC_ReadChar
+	syscall
+	j	$31
+	.end ReadChar
+
+	.globl PrintChar
+	.ent	PrintChar
+PrintChar:
+	addiu $2,$0,SC_PrintChar
+	syscall
+	j	$31
+	.end PrintChar
+
+	.globl ReadString
+	.ent	ReadString
+ReadString:
+	addiu $2,$0,SC_ReadString
+	syscall
+	j	$31
+	.end ReadString
+
+	.globl PrintString
+	.ent	PrintString
+PrintString:
+	addiu $2,$0,SC_PrintString
+	syscall
+	j	$31
+	.end PrintString
+	
 /* dummy function to keep gcc happy */
-        .globl  __main
-        .ent    __main
+    .globl  __main
+    .ent    __main
 __main:
-        j       $31
-        .end    __main
+    j       $31
+    .end    __main
 
