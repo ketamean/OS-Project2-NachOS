@@ -114,9 +114,6 @@ class FileSystem {
 		return -1;
 	}
     bool Remove(char *name) {
-    	for (int i = 0; i < N_FILES_IN_TABLE; ++i) {
-    		
-    	}
     	return Unlink(name) == 0;
     }
 

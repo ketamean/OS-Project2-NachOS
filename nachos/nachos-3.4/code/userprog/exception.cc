@@ -505,8 +505,8 @@ void handle_SC_CreateFile() {
 		return;
 	}
 
-	printf("Finish reading file name.\n");
-	printf("Creating file: <%s>...\n", fname);
+	//printf("Finish reading file name.\n");
+	//printf("Creating file: <%s>...\n", fname);
 
 	int succ = fileSystem->Create(fname, 0);
 	// args: filename = fname, initialSize = 0
@@ -515,7 +515,7 @@ void handle_SC_CreateFile() {
 		printf("Cannot create new file.\n");
 		machine->WriteRegister(2, -1); 	// error
 	}
-	printf("Finish creating file: <%s>\n", fname);
+	//printf("Finish creating file: <%s>\n", fname);
 	machine->WriteRegister(2, 0);	// success
 	delete[] fname;
 }
