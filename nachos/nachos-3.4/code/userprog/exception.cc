@@ -399,7 +399,6 @@ void handle_SC_PrintFloat() {
     }
 
     // Print the buffer to console
-	printf("\nOutput: \n");
     gSynchConsole->Write(buffer, totalLength);
     delete[] buffer;
 	return;
@@ -440,7 +439,6 @@ void handle_SC_PrintChar() {
 	// Input: ONE char, retrieved from f4 using machine->ReadRegisterF(4).
 	// Output: Print ONE char onto the Console
 	char c = (char)machine->ReadRegister(4);
-	printf("\nOutput: \n");
 	gSynchConsole->Write(&c, 1); // 1 byte
 	return;
 }
@@ -473,7 +471,6 @@ void handle_SC_PrintString() {
 	while (buffer[length] != 0) {
 		length++; // Count the length of the string
 	}
-	printf("\nOutput: \n");
 	gSynchConsole->Write(buffer, length + 1); // Write the string to the Console (length + 1 for the null terminator)
 	delete buffer; 
 	return;
