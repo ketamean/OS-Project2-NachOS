@@ -16,6 +16,11 @@
 #include "stats.h"
 #include "timer.h"
 
+//ADDED FOR PRJ3
+#include "bitmap.h"
+#include "ptable.h"
+#include "stable.h"
+
 // Initialization and cleanup routines
 extern void Initialize(int argc, char **argv); 	// Initialization,
 						// called before anything else
@@ -35,6 +40,12 @@ extern Timer *timer;				// the hardware alarm clock
 #include "synch.h"
 extern Machine* machine; // user program memory and registers
 extern SynchConsole* gSynchConsole; // the simulate console
+
+//ADDED FOR PRJ3
+extern Semaphore *addrLock;	// Semaphore for address
+extern BitMap *gPhysPageBitMap;	// Frame manager
+extern PTable *pTab;		// Process table
+extern STable *semTab;		// Semaphore table
 #endif
 
 #ifdef FILESYS_NEEDED 		// FILESYS or FILESYS_STUB 

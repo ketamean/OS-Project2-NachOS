@@ -31,6 +31,7 @@ class AddrSpace {
     void SaveState();			// Save/restore address space-specific
     void RestoreState();		// info on a context switch 
 
+    bool usedPhyPage[NumPhysPages]; //Used to keep track of physical pages that are used
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
 					// for now!
