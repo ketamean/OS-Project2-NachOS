@@ -1,5 +1,5 @@
 #include "stable.h"
-
+// FOR WHATEVER REASON THE UP AND DOWN FUNCTIONS ARE NAMED SIGNAL AND WAIT
 // Constructor
 STable::STable()
 {	
@@ -59,7 +59,7 @@ int STable::Create(char *name, int init)
 	return 0;
 }
 
-int STable::Wait(char *name)
+int STable::Wait(char *name) // This is Down() operation
 {
 	for(int i =0; i < MAX_SEMAPHORE; i++)
 	{
@@ -79,7 +79,7 @@ int STable::Wait(char *name)
 	return -1;
 }
 
-int STable::Signal(char *name)
+int STable::Signal(char *name) // This is Up() operation
 {
     // Similar to the Wait function
 	for(int i =0; i < MAX_SEMAPHORE; i++)

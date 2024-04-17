@@ -705,6 +705,123 @@ void handle_SC_OpenFile() {
 	delete[] fname;
 }
 
+
+//-----------------------ADDED FOR PPRJ3--------------------------
+// I think the pdf had already explained the functions below pretty well so refer to it for a report
+int handle_SC_Join() {
+	// Input: Address Id of the process
+	// Output: 0 if success, -1 if error
+	int id = machine->ReadRegister(4); // Read the process id from r4
+	int res = pTab->JoinUpdate(id); // Update the process
+	
+	machine->WriteRegister(2, res);
+	return;
+}
+
+void handle_SC_Exit() {
+	// Input: status code
+	int exitStatus = machine->ReadRegister(4);
+	if(exitStatus != 0) return;	// If the exit status is not 0, return	
+
+	int res = pTab->ExitUpdate(exitStatus); // Update the process
+	//machine->WriteRegister(2, res); 
+
+	currentThread->FreeSpace(); // Free the space
+	currentThread->Finish(); // Finish the thread
+	return; 
+}
+
+
+int handle_SC_CreateSemaphore() {
+	int virtAddr = machine->ReadRegister(4);
+	int semval = machine->ReadRegister(5);
+
+	char *name = User2System(virtAddr, MaxFileLength + 1);
+	if(name == NULL)
+	{
+		DEBUG('a', "\n Not enough memory in System \n");
+		printf("\n Not enough memory in System \n");
+		machine->WriteRegister(2, -1);
+		delete[] name;
+		return;
+	}
+	
+	int res = semTab->Create(name, semval);
+
+	if(res == -1)
+	{
+		DEBUG('a', "\n Cannot create semaphore \n");
+		printf("\n Cannot create semaphore \n");
+		machine->WriteRegister(2, -1);
+		delete[] name;
+		return;				
+	}
+	
+	delete[] name;
+	machine->WriteRegister(2, res);
+	return;
+}
+
+int handle_SC_Up() { 
+	// int Signal(char* name)
+	int virtAddr = machine->ReadRegister(4);
+
+	char *name = User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	if(name == NULL)
+	{
+		DEBUG('a', "\n Not enough memory in System \n");
+		printf("\n Not enough memory in System \n");
+		machine->WriteRegister(2, -1);
+		delete[] name;
+		return;
+	}
+	
+	int res = semTab->Signal(name);
+
+	if(res == -1)
+	{
+		DEBUG('a', "\n There is no semaphore with this name \n");
+		printf("\n There is no semaphore with this name \n");
+		machine->WriteRegister(2, -1);
+		delete[] name;
+		return;				
+	}
+	
+	delete[] name;
+	machine->WriteRegister(2, res);
+	return;
+}
+
+int handle_SC_Down(char* name) {
+	// int Wait(char* name)
+	int virtAddr = machine->ReadRegister(4);
+
+	char *name = User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	if(name == NULL)
+	{
+		DEBUG('a', "\n Not enough memory in System \n");
+		printf("\n Not enough memory in System \n");
+		machine->WriteRegister(2, -1);
+		delete[] name;
+		return;
+	}
+	
+	int res = semTab->Wait(name);
+
+	if(res == -1)
+	{
+		DEBUG('a', "\n There is no semaphore with this name \n");
+		printf("\n There is no semaphore with this name \n");
+		machine->WriteRegister(2, -1);
+		delete[] name;
+		return;				
+	}
+	
+	delete[] name;
+	machine->WriteRegister(2, res);
+	return;
+}
+
 /* EXCEPTION HANDLER */
 
 void ExceptionHandler(ExceptionType which) {
@@ -809,7 +926,38 @@ void ExceptionHandler(ExceptionType which) {
 					handle_SC_PrintString();
 					IncrementR();
 					break;
-				}		
+				}	
+				// ADDED FOR PPRJ3
+				case SC_Join:
+				{
+					handle_SC_Join();
+					IncrementR();
+					break;
+				}
+				case SC_Exit:
+				{
+					handle_SC_Exit();
+					IncrementR();
+					break;
+				}
+				case SC_CreateSemaphore:
+				{
+					handle_SC_CreateSemaphore();
+					IncrementR();
+					break;
+				}
+				case SC_Up:
+				{
+					handle_SC_Up();
+					IncrementR();
+					break;
+				}
+				case SC_Down:
+				{
+					handle_SC_Down();
+					IncrementR();
+					break;
+				}
 			}
 	}
 }
