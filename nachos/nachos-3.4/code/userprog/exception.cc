@@ -74,7 +74,7 @@ void IncrementR()
 // Input: User(int) Space - buffer(int) limit
 // Output: A pointer to a character array (char*) containing the copied string.
 // Function: Copy a string of characters from user space to kernel space in NachOS. 
-char* User2System(int virtAddr, int limit) {
+/* char* User2System(int virtAddr, int limit) {
 	int idx;
 	int oneChar; // hold one char for itterating (duh)
 	char* kernelBuf = NULL; 
@@ -97,11 +97,11 @@ char* User2System(int virtAddr, int limit) {
 	}
 	return kernelBuf; // NOTICE: This returns the kernelBuf POINTER, which holds the copied string from user space to kernel space.
 }
-
+ */
 // Input: User(int) Space - buffer(int) limit - buffer(char*) Space
 // Output: The number of characters actually copied. If successful, this should be equal to len. 
 // Function: Copy a string of characters from kernel space to user space in a NachOS. 
-int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added len parameter
+/* int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added len parameter
 {
 	if (len < 0) return -1; 
 	if (len == 0)return len; // Your typical errors
@@ -116,7 +116,7 @@ int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added l
 	} while (i < len && oneChar != 0);
 	return i;
 }
-
+ */
 
 /* --NOTICE: FOR MORE THAN ONE TASKS PERFORMANCE, REPLACE 'interrupt->Halt()' WITH A R INCREMENTER-- */
 
