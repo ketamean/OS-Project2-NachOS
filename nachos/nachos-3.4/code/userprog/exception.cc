@@ -759,7 +759,7 @@ int handle_SC_CreateSemaphore() {
 	
 	delete[] name;
 	machine->WriteRegister(2, res);
-	return;
+	return res;
 }
 
 int handle_SC_Up() { 
@@ -792,7 +792,7 @@ int handle_SC_Up() {
 	return;
 }
 
-int handle_SC_Down(char* name) {
+int handle_SC_Down() {
 	// int Wait(char* name)
 	int virtAddr = machine->ReadRegister(4);
 
