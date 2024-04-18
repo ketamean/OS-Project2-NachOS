@@ -28,6 +28,8 @@
 #include "ptable.h"
 #include "stable.h"
 
+
+#define MaxFileLength 255
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
