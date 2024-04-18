@@ -16,11 +16,6 @@
 #include "stats.h"
 #include "timer.h"
 
-//ADDED FOR PRJ3
-#include "bitmap.h"
-#include "ptable.h"
-#include "stable.h"
-
 // Initialization and cleanup routines
 extern void Initialize(int argc, char **argv); 	// Initialization,
 						// called before anything else
@@ -38,6 +33,10 @@ extern Timer *timer;				// the hardware alarm clock
 #include "machine.h"
 #include "synchcons.h"
 #include "synch.h"
+//ADDED FOR PRJ3
+#include "bitmap.h"
+#include "ptable.h"
+#include "stable.h"
 extern Machine* machine; // user program memory and registers
 extern SynchConsole* gSynchConsole; // the simulate console
 
