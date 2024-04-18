@@ -29,7 +29,7 @@
 #include "stable.h"
 
 
-#define MaxFileLength 255
+#define MaxFileLength 32
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -739,10 +739,19 @@ void handle_SC_Exit() {
 
 
 void handle_SC_CreateSemaphore() {
+	// Cu phap: int CreateSemaphore(char* name, int semval);
+	// Input: Semaphore's name and Value
+	// Ouput: Success: 0 - Failed: -1
+
+	// Read addr of "name" from register r4
 	int virtAddr = machine->ReadRegister(4);
+	// Read value of "semval" from register r5
 	int semval = machine->ReadRegister(5);
 
+	// Change addr "name" from user space to system space
 	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
+
+	// Check "name"
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -752,27 +761,35 @@ void handle_SC_CreateSemaphore() {
 		return;
 	}
 	
+	// Call function to create a semaphore
 	int res = semTab->Create(name, semval);
 
 	if(res == -1)
 	{
-		DEBUG('a', "\n Cannot create semaphore \n");
-		printf("\n Cannot create semaphore \n");
+		DEBUG('a', "\nCannot create semaphore (%s, %d)", name, &semval);
+		printf("\n Cannot create semaphore (%s, %d)", name, &semval);
 		machine->WriteRegister(2, -1);
 		delete[] name;
 		return;				
 	}
-	
 	delete[] name;
+	// Write the result to register r2
 	machine->WriteRegister(2, res);
 	return;
 }
 
 void handle_SC_Up() { 
-	// int Signal(char* name)
-	int virtAddr = machine->ReadRegister(4);
+	// Syntax: void Up(char* name);
+	// Input: Semaphore's name
+	// Ouput: Success: 0 - Failed: -1
 
-	char *name = machine->User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	// Read addr of "name" from register r4
+	int virtAddr = machine->ReadRegister(4);
+	
+	// Change addr "name" from user space to system space
+	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
+
+	// Check "name"
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -782,8 +799,8 @@ void handle_SC_Up() {
 		return;
 	}
 	
+	// Check if "name" is avaiable in STable
 	int res = semTab->Signal(name);
-
 	if(res == -1)
 	{
 		DEBUG('a', "\n There is no semaphore with this name \n");
@@ -794,15 +811,23 @@ void handle_SC_Up() {
 	}
 	
 	delete[] name;
+	// Write the result to register r2
 	machine->WriteRegister(2, res);
 	return;
 }
 
 void handle_SC_Down() {
-	// int Wait(char* name)
+	// Syntax: void Down(char* name);
+	// Input: Semaphore's name
+	// Ouput: Success: 0 - Failed: -1
+
+	// Read addr of "name" from register r4
 	int virtAddr = machine->ReadRegister(4);
 
-	char *name = machine->User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	// Change addr "name" from user space to system space
+	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
+
+	// Check "name"
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -811,7 +836,8 @@ void handle_SC_Down() {
 		delete[] name;
 		return;
 	}
-	
+
+	// Check if "name" is avaiable in STable
 	int res = semTab->Wait(name);
 
 	if(res == -1)
@@ -824,6 +850,7 @@ void handle_SC_Down() {
 	}
 	
 	delete[] name;
+	// Write the result to register r2
 	machine->WriteRegister(2, res);
 	return;
 }
