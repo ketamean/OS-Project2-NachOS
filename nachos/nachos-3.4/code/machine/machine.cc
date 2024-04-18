@@ -44,6 +44,52 @@ void CheckEndian()
 #endif
 }
 
+// Input: User(int) Space - buffer(int) limit
+// Output: A pointer to a character array (char*) containing the copied string.
+// Function: Copy a string of characters from user space to kernel space in NachOS. 
+char* Machine::User2System(int virtAddr, int limit) {
+    int idx;
+    int oneChar; // hold one char for itterating (duh)
+    char* kernelBuf = NULL; 
+    // Allocates memory for a character buffer (kernelBuf) in kernel space using the new operator. 
+    // The size of the buffer is limit + 1 to accommodate a terminal character ('\0').
+    kernelBuf = new char[limit + 1]; // Needed for terminal char*
+    if (kernelBuf == NULL)
+        return kernelBuf; // NULL => Non-successful allocation
+        
+    memset(kernelBuf, 0, limit + 1); 
+    // Initializes the allocated memory with zeros using the memset function. 
+    // This ensures that the memory buffer is properly initialized, especially for cases where the entire buffer may not be filled with data.
+    
+    for (idx = 0; idx < limit; idx++)
+    {
+        machine->ReadMem(virtAddr + idx, 1, &oneChar);
+        kernelBuf[idx] = (char)oneChar;
+        if (oneChar == 0)
+            break;
+    }
+    return kernelBuf; // NOTICE: This returns the kernelBuf POINTER, which holds the copied string from user space to kernel space.
+}
+
+// Input: User(int) Space - buffer(int) limit - buffer(char*) Space
+// Output: The number of characters actually copied. If successful, this should be equal to len. 
+// Function: Copy a string of characters from kernel space to user space in a NachOS. 
+int Machine::System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added len parameter
+{
+    if (len < 0) return -1; 
+    if (len == 0)return len; // Your typical errors
+    int i = 0;
+    int oneChar = 0;
+    do{
+        oneChar = (int)buffer[i];
+        machine->WriteMem(virtAddr + i, 1, oneChar); 
+        // Writes the character oneChar to the memory location 
+        // specified by virtAddr + i in user space using the machine->WriteMem function.
+        i++;
+    } while (i < len && oneChar != 0);
+    return i;
+}
+
 //----------------------------------------------------------------------
 // Machine::Machine
 // 	Initialize the simulation of user program execution.
