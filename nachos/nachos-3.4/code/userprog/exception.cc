@@ -822,6 +822,13 @@ int handle_SC_Down(char* name) {
 	return;
 }
 
+void handle_SC_Exec() {
+	// read char* name argument 
+	int virtAddr = machine->ReadRegister(4);
+
+	
+}
+
 /* EXCEPTION HANDLER */
 
 void ExceptionHandler(ExceptionType which) {
