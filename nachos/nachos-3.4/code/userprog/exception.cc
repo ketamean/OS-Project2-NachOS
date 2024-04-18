@@ -625,7 +625,6 @@ void handle_SC_OpenFile() {
 	}
 	char* fname = machine->User2System(virAddr_name, MAX_FILENAME_LEN);
 	if (!fname) {
-
 		printf("Invalid file name: %s\n", fname);
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
@@ -782,6 +781,15 @@ void handle_SC_Exec() {
 	int virtAddr = machine->ReadRegister(4);
 
 	char* name = machine->User2System(virtAddr, MAX_FILENAME_LEN);
+	if (name == NULL) {
+		printf("Invalid file name: %s\n", fname);
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	}
+
+	// ExecUpdate returns -1 if error; otherwise, returns the pID. In both cases, we return this value (write it to reg r2)
+	// if an error occurs, it had already been printed before returing -1
+	machine->WriteRegister(2, pTab->ExecUpdate(name));
 }
 
 /* EXCEPTION HANDLER */
