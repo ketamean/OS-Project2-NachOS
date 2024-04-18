@@ -4,9 +4,6 @@
 #include "bitmap.h"
 #define MAX_SEMAPHORE 10 // Follwing the instruction, we can only create 10 semaphores
 
-
-#endif // STABLE_H
-
 class Sem
 {
 private:
@@ -66,3 +63,5 @@ public:
 	// Find the empty slot in the semaphore table
 	int FindFreeSlot();
 };
+
+#endif // STABLE_H
