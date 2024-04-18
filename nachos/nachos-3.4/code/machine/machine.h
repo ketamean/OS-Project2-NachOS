@@ -182,6 +182,18 @@ class Machine {
     TranslationEntry *pageTable;
     unsigned int pageTableSize;
 
+	/* USER SPACE AND KERNEL SPACE ALLOCATION */
+
+	// Input: User(int) Space - buffer(int) limit
+	// Output: A pointer to a character array (char*) containing the copied string.
+	// Function: Copy a string of characters from user space to kernel space in NachOS. 
+	char* User2System(int virtAddr, int limit);
+
+	// Input: User(int) Space - buffer(int) limit - buffer(char*) Space
+	// Output: The number of characters actually copied. If successful, this should be equal to len. 
+	// Function: Copy a string of characters from kernel space to user space in a NachOS. 
+	int System2User(int virtAddr, int len, char* buffer);
+
   private:
     bool singleStep;		// drop back into the debugger after each
 				// simulated instruction

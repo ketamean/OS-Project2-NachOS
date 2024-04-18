@@ -455,10 +455,10 @@ void handle_SC_ReadString() {
 	virtAddr = machine->ReadRegister(4); // Get address of the buffer in User Space, retrieved from r4
 	length = machine->ReadRegister(5); // Length input of the buffer, retrieved from r5
 
-	/* FIRST APPERANCE OF User2System - System2User methods */
-	buffer = User2System(virtAddr, length); // Copy string from User Space to System Space
+	/* FIRST APPERANCE OF machine->User2System - machine->System2User methods */
+	buffer = machine->User2System(virtAddr, length); // Copy string from User Space to System Space
 	gSynchConsole->Read(buffer, length); // Read it (duh)
-	System2User(virtAddr, length, buffer); // Copy it back to User Space
+	machine->System2User(virtAddr, length, buffer); // Copy it back to User Space
 	delete buffer; 
 	return;
 }
@@ -470,7 +470,7 @@ void handle_SC_PrintString() {
 	char* buffer;
 	virtAddr = machine->ReadRegister(4); // Get address of the buffer in User Space, retrieved from r4
 
-	buffer = User2System(virtAddr, 255); // Copy string from User Space to System Space
+	buffer = machine->User2System(virtAddr, 255); // Copy string from User Space to System Space
 	int length = 0; // Length of the string (default 0)
 	while (buffer[length] != 0) {
 		length++; // Count the length of the string
@@ -493,7 +493,7 @@ void handle_SC_CreateFile() {
 //		Reg 2: 0 if success; otherwise, -1
 	int virtualAddr = machine->ReadRegister(4);
 	printf("Reading file name...\n");
-	char* fname = User2System(virtualAddr, MAX_FILENAME_LEN);
+	char* fname = machine->User2System(virtualAddr, MAX_FILENAME_LEN);
 	if (!fname) {
 		printf("Not enough memory in system!\n");
 		machine->WriteRegister(2, -1); 	// error
@@ -570,7 +570,7 @@ void handle_SC_ReadFile() {
 		machine->WriteRegister(2, nbytes);
 	}
 
-	System2User(virtualAddress, nbytes, buffer);
+	machine->System2User(virtualAddress, nbytes, buffer);
 	if (buffer)
 		// printf("Read file with id <%d>, content: %s\n", fileid, buffer);
 		delete[] buffer;
@@ -586,7 +586,7 @@ void handle_SC_WriteFile() {
 	int virtualAddress = machine->ReadRegister(4);
 	int charcount = machine->ReadRegister(5);
 	int fileid = machine->ReadRegister(6);
-	char* buffer = User2System(virtualAddress, charcount);
+	char* buffer = machine->User2System(virtualAddress, charcount);
 	int nbytes;
 	OpenFile* f = 0;
 
@@ -672,7 +672,7 @@ void handle_SC_OpenFile() {
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
 	}
-	char* fname = User2System(virAddr_name, MAX_FILENAME_LEN);
+	char* fname = machine->User2System(virAddr_name, MAX_FILENAME_LEN);
 	if (!fname) {
 
 		printf("Invalid file name: %s\n", fname);
@@ -740,7 +740,7 @@ void handle_SC_CreateSemaphore() {
 	int virtAddr = machine->ReadRegister(4);
 	int semval = machine->ReadRegister(5);
 
-	char *name = User2System(virtAddr, MaxFileLength + 1);
+	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -770,7 +770,7 @@ void handle_SC_Up() {
 	// int Signal(char* name)
 	int virtAddr = machine->ReadRegister(4);
 
-	char *name = User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	char *name = machine->User2System(virtAddr, MAX_FILENAME_LEN + 1);
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -800,7 +800,7 @@ void handle_SC_Down() {
 	// int Wait(char* name)
 	int virtAddr = machine->ReadRegister(4);
 
-	char *name = User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	char *name = machine->User2System(virtAddr, MAX_FILENAME_LEN + 1);
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -830,7 +830,7 @@ void handle_SC_Exec() {
 	// read char* name argument 
 	int virtAddr = machine->ReadRegister(4);
 
-	
+	char* name = machine->User2System(virtAddr, MAX_FILENAME_LEN);
 }
 
 /* EXCEPTION HANDLER */
