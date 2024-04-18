@@ -708,7 +708,7 @@ void handle_SC_OpenFile() {
 
 //-----------------------ADDED FOR PPRJ3--------------------------
 // I think the pdf had already explained the functions below pretty well so refer to it for a report
-int handle_SC_Join() {
+void handle_SC_Join() {
 	// Input: Address Id of the process
 	// Output: 0 if success, -1 if error
 	int id = machine->ReadRegister(4); // Read the process id from r4
@@ -732,7 +732,7 @@ void handle_SC_Exit() {
 }
 
 
-int handle_SC_CreateSemaphore() {
+void handle_SC_CreateSemaphore() {
 	int virtAddr = machine->ReadRegister(4);
 	int semval = machine->ReadRegister(5);
 
@@ -759,10 +759,10 @@ int handle_SC_CreateSemaphore() {
 	
 	delete[] name;
 	machine->WriteRegister(2, res);
-	return res;
+	return;
 }
 
-int handle_SC_Up() { 
+void handle_SC_Up() { 
 	// int Signal(char* name)
 	int virtAddr = machine->ReadRegister(4);
 
@@ -792,7 +792,7 @@ int handle_SC_Up() {
 	return;
 }
 
-int handle_SC_Down() {
+void handle_SC_Down() {
 	// int Wait(char* name)
 	int virtAddr = machine->ReadRegister(4);
 
