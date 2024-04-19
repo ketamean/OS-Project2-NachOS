@@ -4,8 +4,6 @@
 #include "thread.h"
 #include "addrspace.h"
 
-extern void MyStartProcess(int pID);
-
 PCB::PCB(int id)
 {
 	joinsem= new Semaphore("JoinSem",0);
@@ -20,6 +18,7 @@ PCB::PCB(int id)
 		parentID= 0;
 	thread= NULL;
 	JoinStatus= -1;
+
 }
 
 PCB::~PCB()
@@ -112,3 +111,22 @@ int PCB::Exec(char *filename, int pID)
 
 
 //*************************************************************************************
+void MyStartProcess(int pID)
+{
+	char *filename= processTab->GetName(pID);
+	AddrSpace *space= new AddrSpace(filename);
+	if(space == NULL)
+	{
+		printf("\nLoi: Khong du bo nho de cap phat cho tien trinh !!!\n");
+		return; 
+	}
+	currentThread->space= space;
+
+	space->InitRegisters();		// set the initial register values
+	space->RestoreState();		// load page table register
+
+	machine->Run();			// jump to the user progam
+	ASSERT(FALSE);			// machine->Run never returns;
+						// the address space exits
+						// by doing the syscall "exit"
+}
