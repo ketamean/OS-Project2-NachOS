@@ -23,17 +23,20 @@
 void
 StartProcess(char *filename)
 {
-	//OpenFile *executable = fileSystem->Open(filename);
-    AddrSpace *space; 
+    // Open file with filename
+    // OpenFile *executable = fileSystem->Open(filename);
 
-/*     if (executable == NULL) {
-	printf("Unable to open file %s\n", filename);
-	return;
+    AddrSpace *space; // Virtual memory
+/*
+    if (executable == NULL) {
+        printf("Unable to open file %s\n", filename);
+        return;
     } */
+    // 
     space = new AddrSpace(filename);    
     currentThread->space = space;
 
-    //delete executable;			// close file
+//    delete executable;			// close file
 
     space->InitRegisters();		// set the initial register values
     space->RestoreState();		// load page table register
@@ -102,3 +105,4 @@ void MyStartProcess(int pID)
 						// the address space exits
 						// by doing the syscall "exit"
 }
+
