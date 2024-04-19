@@ -14,6 +14,29 @@
 #include "addrspace.h"
 #include "synch.h"
 
+void StartProcess_2(int id)
+{
+    char* fileName = pTab->GetFileName(id);
+
+    AddrSpace *space;
+    space = new AddrSpace(fileName);
+
+	if(space == NULL)
+	{
+		printf("\nPCB::Exec : Can't create AddSpace.");
+		return;
+	}
+
+    currentThread->space = space;
+
+    space->InitRegisters();		
+    space->RestoreState();		
+
+    machine->Run();		
+    ASSERT(FALSE);		
+}
+
+
 //----------------------------------------------------------------------
 // StartProcess
 // 	Run a user program.  Open the executable, load it into
@@ -23,17 +46,17 @@
 void
 StartProcess(char *filename)
 {
-    OpenFile *executable = fileSystem->Open(filename);
-    AddrSpace *space;
+	//OpenFile *executable = fileSystem->Open(filename);
+    AddrSpace *space; 
 
-    if (executable == NULL) {
+/*     if (executable == NULL) {
 	printf("Unable to open file %s\n", filename);
 	return;
-    }
-    space = new AddrSpace(executable);    
+    } */
+    space = new AddrSpace(filename);    
     currentThread->space = space;
 
-    delete executable;			// close file
+    //delete executable;			// close file
 
     space->InitRegisters();		// set the initial register values
     space->RestoreState();		// load page table register
