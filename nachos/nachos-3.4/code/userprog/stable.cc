@@ -1,5 +1,5 @@
 #include "stable.h"
-// FOR WHATEVER REASON THE UP AND DOWN FUNCTIONS ARE NAMED SIGNAL AND WAIT
+
 // Constructor
 STable::STable()
 {	
@@ -33,7 +33,7 @@ STable::~STable()
 int STable::Create(char *name, int init)
 {
 
-	// If the semaphore name already exists, return -1
+	// Check da ton tai semaphore nay chua?
 	for(int i=0; i<MAX_SEMAPHORE; i++)
 	{
 		if(bm->Test(i))
@@ -45,62 +45,61 @@ int STable::Create(char *name, int init)
 		}
 		
 	}
-	// Find a free slot
+	// Tim slot tren bang semTab trong
 	int id = this->FindFreeSlot();
 	
-	// If there is no free slot, return -1
+	// Neu k tim thay thi tra ve -1
 	if(id < 0)
 	{
 		return -1;
 	}
 
-	// Create a new semaphore with name and initial value
+	// Neu tim thay slot trong thi nap Semaphore vao semTab[id]
 	this->semTab[id] = new Sem(name, init);
 	return 0;
 }
 
-int STable::Wait(char *name) // This is Down() operation
+int STable::Wait(char *name)
 {
 	for(int i =0; i < MAX_SEMAPHORE; i++)
 	{
-		// Check if the i-th slot has been loaded with a semaphore
+		// Kiem tra o thu i da duoc nap semaphore chua
 		if(bm->Test(i))
 		{
-			// If yes, compare the name with the name of the semaphore in semTab
+			// Neu co thi tien hanh so sanh name voi name cua semaphore trong semTab
 			if(strcmp(name, semTab[i]->GetName()) == 0)
 			{
-				// If it exists, execute the semaphore wait();
+				// Neu ton tai thi cho semaphore down(); 
 				semTab[i]->wait();
 				return 0;
 			}
 		}
 	}
-	printf("Semaphore does not exist");
+	printf("Khong ton tai semaphore");
 	return -1;
 }
 
-int STable::Signal(char *name) // This is Up() operation
+int STable::Signal(char *name)
 {
-    // Similar to the Wait function
 	for(int i =0; i < MAX_SEMAPHORE; i++)
 	{
-		// Check if the i-th slot has been loaded with a semaphore
+		// Kiem tra o thu i da duoc nap semaphore chua
 		if(bm->Test(i))
 		{
-			// If yes, compare the name with the name of the semaphore in semTab
+			// Neu co thi tien hanh so sanh name voi name cua semaphore trong semTab
 			if(strcmp(name, semTab[i]->GetName()) == 0)
 			{
-				// If it exists, execute the semaphore signal();
+				// Neu ton tai thi cho semaphore up(); 
 				semTab[i]->signal();
 				return 0;
 			}
 		}
 	}
-	printf("Semaphore does not exist");
+	printf("Khong ton tai semaphore");
 	return -1;
 }
 
 int STable::FindFreeSlot()
 {
-	return this->bm->FindFreeSlot();
+	return this->bm->Find();
 }

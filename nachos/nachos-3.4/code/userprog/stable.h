@@ -2,17 +2,19 @@
 #define STABLE_H
 #include "synch.h"
 #include "bitmap.h"
-#define MAX_SEMAPHORE 10 // Follwing the instruction, we can only create 10 semaphores
+#define MAX_SEMAPHORE 10
 
+#endif // STABLE_H
+
+// Lop Sem dung de quan ly semaphore.
 class Sem
 {
 private:
 	char name[50];		// Ten cua semaphore
 	Semaphore* sem;		// Tao semaphore de quan ly
 public:
-	// Initialize semaphore with name and initial value
-    // If the semaphore is not initialized, the value is 0
-    // If the semaphore is initialized, the value is i
+	// Khoi tao doi tuong Sem. Gan gia tri ban dau la null
+	// Nho khoi tao sem su dung
 	Sem(char* na, int i)
 	{
 		strcpy(this->name, na);
@@ -44,24 +46,25 @@ public:
 class STable
 {
 private:
-	BitMap* bm;	// Empty slot management
-	Sem* semTab[MAX_SEMAPHORE];
+	BitMap* bm;	// quản lý slot trống
+	Sem* semTab[MAX_SEMAPHORE];	// quản lý tối đa 10 đối tượng Sem
 public:
-    // Initialize the empty slot management
-    // The initial value of the semaphore is null
+	//khởi tạo size đối tượng Sem để quản lý 10 Semaphore. Gán giá trị ban đầu là null
+	// nhớ khởi tạo bm để sử dụng
 	STable();		
 
-	~STable();	// Destructor
-	int Create(char *name, int init); // Create a semaphore with name and initial value
+	~STable();	// hủy các đối tượng đã tạo
+	// Kiểm tra Semaphore “name” chưa tồn tại thì tạo Semaphore mới. Ngược lại, báo lỗi.
+	int Create(char *name, int init);
 
-	// If the semaphore “name” exists, call this->P() to execute. Otherwise, report an error.
+	// Nếu tồn tại Semaphore “name” thì gọi this->P()để thực thi. Ngược lại, báo lỗi.
 	int Wait(char *name);
 
-	// If the semaphore “name” exists, call this->V() to execute. Otherwise, report an error.
+	// Nếu tồn tại Semaphore “name” thì gọi this->V()để thực thi. Ngược lại, báo lỗi.
 	int Signal(char *name);
 	
-	// Find the empty slot in the semaphore table
+	// Tìm slot trống.
 	int FindFreeSlot();
-};
 
-#endif // STABLE_H
+	
+};
