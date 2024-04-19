@@ -860,14 +860,24 @@ void handle_SC_Exec() {
 
 	char* name = machine->User2System(virtAddr, MAX_FILENAME_LEN);
 	if (name == NULL) {
-		printf("Cannot get file name\n.");
+		printf("Cannot get file name: not enough memory\n.");
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
 	}
 
+	// check whether the file is readable
+	OpenFile* f = fileSystem->Open(name);
+	if ( f == NULL ) {
+		printf("Cannot open file %s\n.", name);
+		machine->WriteRegister(2, -1); 	// returns error
+		return;
+	}
+	delete f;
+
 	// ExecUpdate returns -1 if error; otherwise, returns the pID. In both cases, we return this value (write it to reg r2)
 	// if an error occurs, it had already been printed before returing -1
 	machine->WriteRegister(2, pTab->ExecUpdate(name));
+	delete[] name;
 }
 
 /* EXCEPTION HANDLER */
@@ -1003,6 +1013,12 @@ void ExceptionHandler(ExceptionType which) {
 				case SC_Down:
 				{
 					handle_SC_Down();
+					IncrementR();
+					break;
+				}
+				case SC_Exec:
+				{
+					handle_SC_Exec();
 					IncrementR();
 					break;
 				}
