@@ -102,5 +102,5 @@ int STable::Signal(char *name) // This is Up() operation
 
 int STable::FindFreeSlot()
 {
-	return this->bm->Find();
+	return this->bm->FindFreeSlot();
 }

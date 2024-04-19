@@ -47,7 +47,7 @@ FileHeader::Allocate(BitMap *freeMap, int fileSize)
 	return FALSE;		// not enough space
 
     for (int i = 0; i < numSectors; i++)
-	dataSectors[i] = freeMap->Find();
+	dataSectors[i] = freeMap->FindFreeSlot();
     return TRUE;
 }
 
