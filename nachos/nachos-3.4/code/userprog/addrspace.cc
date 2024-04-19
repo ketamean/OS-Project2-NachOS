@@ -67,7 +67,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
 
     if (executable == NULL)
     {
-    	printf("Unable to open file %s\n");
+    	printf("AddrSpace: Unable to open file\n");
 	    return ;
     }
 
@@ -151,7 +151,7 @@ AddrSpace::AddrSpace(char* filename)
 
     if (executable == NULL)
     {
-    	printf("Unable to open file %s\n", filename);
+    	printf("AddrSpace: Unable to open file %s\n.", filename);
 	    return;
     }
 
