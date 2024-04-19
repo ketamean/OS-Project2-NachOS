@@ -860,7 +860,7 @@ void handle_SC_Exec() {
 
 	char* name = machine->User2System(virtAddr, MAX_FILENAME_LEN);
 	if (name == NULL) {
-		printf("Invalid file name: %s\n", fname);
+		printf("Cannot get file name\n.");
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
 	}
