@@ -876,6 +876,7 @@ void handle_SC_Exec() {
 
 	// ExecUpdate returns -1 if error; otherwise, returns the pID. In both cases, we return this value (write it to reg r2)
 	// if an error occurs, it had already been printed before returing -1
+	
 	machine->WriteRegister(2, pTab->ExecUpdate(name));
 	delete[] name;
 }

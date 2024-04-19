@@ -67,7 +67,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
 
     if (executable == NULL)
     {
-    	printf("Unable to open file %s\n");
+    	printf("AddrSpace: Unable to open file\n");
 	    return ;
     }
 
@@ -136,7 +136,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
 	        executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]) + (pageTable[i].physicalPage*PageSize),PageSize, noffH.initData.inFileAddr+(i*PageSize));
     }	
 
-   delete executable;
+   // delete executable;
 }
 
 // =========================================================================
@@ -151,7 +151,7 @@ AddrSpace::AddrSpace(char* filename)
 
     if (executable == NULL)
     {
-    	printf("Unable to open file %s\n", filename);
+    	printf("AddrSpace: Unable to open file %s\n.", filename);
 	    return;
     }
 

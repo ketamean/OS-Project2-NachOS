@@ -20,7 +20,6 @@ PCB::PCB(int id)
 		parentID= 0;
 	thread= NULL;
 	JoinStatus= -1;
-
 }
 
 PCB::~PCB()
