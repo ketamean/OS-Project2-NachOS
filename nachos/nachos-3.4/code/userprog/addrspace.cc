@@ -182,6 +182,7 @@ AddrSpace::AddrSpace(char* filename)
 	    numPages = 0;
 	    delete executable;
 	    addrLock->V();
+        return;
     }
 
     DEBUG('a', "Initializing address space, num pages %d, size %d\n", 
