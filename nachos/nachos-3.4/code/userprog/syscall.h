@@ -174,6 +174,15 @@ void ReadString (char* buffer, int length);
 /* Uses SynchConsole to print out ONE string from buffer */
 void PrintString (char* buffer);
 
+/* Create a Semaphore */
+int CreateSemaphore(char* name, int semval);
+
+/* Up a Semaphore */
+void Up(char* name);
+
+/* Down a Semaphore */
+void Down(char* name);
+
 #endif /* IN_ASM */
 
 #endif /* SYSCALL_H */

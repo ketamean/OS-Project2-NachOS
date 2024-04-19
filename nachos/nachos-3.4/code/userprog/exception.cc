@@ -28,6 +28,8 @@
 #include "ptable.h"
 #include "stable.h"
 
+
+#define MaxFileLength 32
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -68,6 +70,55 @@ void IncrementR()
    	machine->WriteRegister(NextPCReg, counter + 4);
 }
 
+
+/* USER SPACE AND KERNEL SPACE ALLOCATION */
+
+// Input: User(int) Space - buffer(int) limit
+// Output: A pointer to a character array (char*) containing the copied string.
+// Function: Copy a string of characters from user space to kernel space in NachOS. 
+/* char* User2System(int virtAddr, int limit) {
+	int idx;
+	int oneChar; // hold one char for itterating (duh)
+	char* kernelBuf = NULL; 
+	// Allocates memory for a character buffer (kernelBuf) in kernel space using the new operator. 
+	// The size of the buffer is limit + 1 to accommodate a terminal character ('\0').
+	kernelBuf = new char[limit + 1]; // Needed for terminal char*
+	if (kernelBuf == NULL)
+		return kernelBuf; // NULL => Non-successful allocation
+		
+	memset(kernelBuf, 0, limit + 1); 
+	// Initializes the allocated memory with zeros using the memset function. 
+	// This ensures that the memory buffer is properly initialized, especially for cases where the entire buffer may not be filled with data.
+	
+	for (idx = 0; idx < limit; idx++)
+	{
+		machine->ReadMem(virtAddr + idx, 1, &oneChar);
+		kernelBuf[idx] = (char)oneChar;
+		if (oneChar == 0)
+			break;
+	}
+	return kernelBuf; // NOTICE: This returns the kernelBuf POINTER, which holds the copied string from user space to kernel space.
+}
+ */
+// Input: User(int) Space - buffer(int) limit - buffer(char*) Space
+// Output: The number of characters actually copied. If successful, this should be equal to len. 
+// Function: Copy a string of characters from kernel space to user space in a NachOS. 
+/* int System2User(int virtAddr, int len, char* buffer) // NOTICE: This has added len parameter
+{
+	if (len < 0) return -1; 
+	if (len == 0)return len; // Your typical errors
+	int i = 0;
+	int oneChar = 0;
+	do{
+		oneChar = (int)buffer[i];
+		machine->WriteMem(virtAddr + i, 1, oneChar); 
+		// Writes the character oneChar to the memory location 
+		// specified by virtAddr + i in user space using the machine->WriteMem function.
+		i++;
+	} while (i < len && oneChar != 0);
+	return i;
+}
+ */
 
 /* --NOTICE: FOR MORE THAN ONE TASKS PERFORMANCE, REPLACE 'interrupt->Halt()' WITH A R INCREMENTER-- */
 
@@ -687,10 +738,19 @@ void handle_SC_Exit() {
 
 
 void handle_SC_CreateSemaphore() {
+	// Cu phap: int CreateSemaphore(char* name, int semval);
+	// Input: Semaphore's name and Value
+	// Ouput: Success: 0 - Failed: -1
+
+	// Read addr of "name" from register r4
 	int virtAddr = machine->ReadRegister(4);
+	// Read value of "semval" from register r5
 	int semval = machine->ReadRegister(5);
 
+	// Change addr "name" from user space to system space
 	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
+
+	// Check "name"
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -700,27 +760,35 @@ void handle_SC_CreateSemaphore() {
 		return;
 	}
 	
+	// Call function to create a semaphore
 	int res = semTab->Create(name, semval);
 
 	if(res == -1)
 	{
-		DEBUG('a', "\n Cannot create semaphore \n");
-		printf("\n Cannot create semaphore \n");
+		DEBUG('a', "\nCannot create semaphore (%s, %d)", name, &semval);
+		printf("\n Cannot create semaphore (%s, %d)", name, &semval);
 		machine->WriteRegister(2, -1);
 		delete[] name;
 		return;				
 	}
-	
 	delete[] name;
+	// Write the result to register r2
 	machine->WriteRegister(2, res);
 	return;
 }
 
 void handle_SC_Up() { 
-	// int Signal(char* name)
-	int virtAddr = machine->ReadRegister(4);
+	// Syntax: void Up(char* name);
+	// Input: Semaphore's name
+	// Ouput: Success: 0 - Failed: -1
 
-	char *name = machine->User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	// Read addr of "name" from register r4
+	int virtAddr = machine->ReadRegister(4);
+	
+	// Change addr "name" from user space to system space
+	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
+
+	// Check "name"
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -730,8 +798,8 @@ void handle_SC_Up() {
 		return;
 	}
 	
+	// Check if "name" is avaiable in STable
 	int res = semTab->Signal(name);
-
 	if(res == -1)
 	{
 		DEBUG('a', "\n There is no semaphore with this name \n");
@@ -742,15 +810,23 @@ void handle_SC_Up() {
 	}
 	
 	delete[] name;
+	// Write the result to register r2
 	machine->WriteRegister(2, res);
 	return;
 }
 
 void handle_SC_Down() {
-	// int Wait(char* name)
+	// Syntax: void Down(char* name);
+	// Input: Semaphore's name
+	// Ouput: Success: 0 - Failed: -1
+
+	// Read addr of "name" from register r4
 	int virtAddr = machine->ReadRegister(4);
 
-	char *name = machine->User2System(virtAddr, MAX_FILENAME_LEN + 1);
+	// Change addr "name" from user space to system space
+	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
+
+	// Check "name"
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
@@ -759,7 +835,8 @@ void handle_SC_Down() {
 		delete[] name;
 		return;
 	}
-	
+
+	// Check if "name" is avaiable in STable
 	int res = semTab->Wait(name);
 
 	if(res == -1)
@@ -772,6 +849,7 @@ void handle_SC_Down() {
 	}
 	
 	delete[] name;
+	// Write the result to register r2
 	machine->WriteRegister(2, res);
 	return;
 }
