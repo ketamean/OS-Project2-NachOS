@@ -209,4 +209,3 @@ delete gSynchConsole;
     
     Exit(0);
 }
-
