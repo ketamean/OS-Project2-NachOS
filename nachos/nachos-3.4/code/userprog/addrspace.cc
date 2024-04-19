@@ -136,7 +136,7 @@ AddrSpace::AddrSpace(OpenFile *executable)
 	        executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]) + (pageTable[i].physicalPage*PageSize),PageSize, noffH.initData.inFileAddr+(i*PageSize));
     }	
 
-   delete executable;
+   //delete executable;
 }
 
 // =========================================================================
