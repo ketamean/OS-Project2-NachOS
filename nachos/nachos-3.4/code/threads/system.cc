@@ -197,7 +197,7 @@ delete gSynchConsole;
 //ADDED FOR PRJ3
 delete addrLock;
 delete gPhysPageBitMap;
-delete pTab;
+//delete pTab;
 delete semTab;
 #endif
 
