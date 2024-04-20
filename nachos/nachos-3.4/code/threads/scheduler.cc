@@ -49,7 +49,6 @@ Scheduler::~Scheduler()
 //
 //	"thread" is the thread to be put on the ready list.
 //----------------------------------------------------------------------
-
 void
 Scheduler::ReadyToRun (Thread *thread)
 {
@@ -66,7 +65,6 @@ Scheduler::ReadyToRun (Thread *thread)
 // Side effect:
 //	Thread is removed from the ready list.
 //----------------------------------------------------------------------
-
 Thread *
 Scheduler::FindNextToRun ()
 {

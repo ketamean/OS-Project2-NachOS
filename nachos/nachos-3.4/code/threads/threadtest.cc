@@ -62,11 +62,11 @@ ThreadTest()
 {
     switch (testnum) {
     case 1:
-	ThreadTest1();
-	break;
+    ThreadTest1();
+    break;
     default:
-	printf("No test specified.\n");
-	break;
+    printf("No test specified.\n");
+    break;
     }
 }
 

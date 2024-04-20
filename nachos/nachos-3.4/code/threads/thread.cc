@@ -86,7 +86,6 @@ Thread::~Thread()
 //	"func" is the procedure to run concurrently.
 //	"arg" is a single argument to be passed to the procedure.
 //----------------------------------------------------------------------
-
 void 
 Thread::Fork(VoidFunctionPtr func, int arg)
 {
@@ -183,7 +182,8 @@ Thread::Yield ()
     ASSERT(this == currentThread);
     
     DEBUG('t', "Yielding thread \"%s\"\n", getName());
-    
+    printf("Yielding thread \"%s\"\n", getName());
+
     nextThread = scheduler->FindNextToRun();
     if (nextThread != NULL) {
 	scheduler->ReadyToRun(this);

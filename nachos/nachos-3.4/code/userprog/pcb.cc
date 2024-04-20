@@ -59,7 +59,7 @@ void PCB::SetExitCode(int ec)
 void PCB::IncNumWait()
 {
 	mutex->P();
-	numwait++;
+	++numwait;
 	mutex->V();
 }
 
@@ -67,7 +67,7 @@ void PCB::DecNumWait()
 {
 	mutex->P();
 	if(numwait)
-		numwait--;
+		--numwait;
 	mutex->V();
 }
 
@@ -77,13 +77,15 @@ char* PCB::GetNameThread()
 }
 
 //-------------------------------------------------------------------
+// call JoinWait() to block the current process until JoinRealease is invoked
 void PCB::JoinWait()
 {
-	JoinStatus= parentID;
+	//JoinStatus= parentID;
 	IncNumWait();
 	joinsem->P();
 }
 
+// release the blocked process that called JoinWait()
 void PCB::JoinRelease()
 {
 	DecNumWait();
@@ -118,7 +120,7 @@ int PCB::Exec(char *filename, int pID)
 	parentID = currentThread->processID;
 
 	// call Fork => type-cast Thread to int
-	thread->Fork(MyStartProcess,pID);
+	thread->Fork(MyStartProcess,this->thread->processID);
 	
 	mutex->V();
 	return pID;

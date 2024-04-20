@@ -16,8 +16,8 @@ PTable::PTable(int size)
 		pcb[i] = NULL;
 	bm->Mark(0);
 
-	// pcb[0] = new PCB(0); // new PCB with id = 0
-	// pcb[0]->parentID = -1;
+	pcb[0] = new PCB(0); // new PCB with id = 0
+	pcb[0]->parentID = -1;
 }
 
 PTable::~PTable()
@@ -71,7 +71,7 @@ int PTable::ExecUpdate(char* filename)
 		return -1;
 	}
 ////////////////////////////////////////////////////////////
-
+	printf("PTable::ExecUpdate: file %s, pid = %d.\n", filename, ID);
 	pcb[ID]= new PCB(ID);
 	bm->Mark(ID);
 	pcb[ID]->parentID = currentThread->processID;
@@ -116,7 +116,7 @@ int PTable::ExitUpdate(int ec)
 int PTable::JoinUpdate(int pID)
 {
 	
-	if(pID < 0 || pID > 9)
+	if(pID < 0 || pID >= psize)
 	{
 		printf("\nPTable::JoinUpdate: pID = %d does not exist.\n",pID);
 		return -1;

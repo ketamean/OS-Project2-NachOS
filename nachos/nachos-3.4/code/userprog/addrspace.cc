@@ -203,7 +203,7 @@ AddrSpace::AddrSpace(char* filename)
         printf("Physic Pages %d \n", pageTable[i].physicalPage);
     }
 
-    addrLock->V();
+    addrLock->V(); // release the lock
 
     // then, copy in the code and data segments into memory
     if (noffH.code.size > 0)
