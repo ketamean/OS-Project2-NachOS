@@ -155,14 +155,14 @@ Initialize(int argc, char **argv)
     CallOnUserAbort(Cleanup);			// if user hits ctl-C
     
 #ifdef USER_PROGRAM
-machine = new Machine(debugUserProg); // this must come first
-gSynchConsole = new SynchConsole();
+    machine = new Machine(debugUserProg); // this must come first
+    gSynchConsole = new SynchConsole();
 
-//ADDED FOR PRJ3
-addrLock = new Semaphore("addrLock", 1);
-gPhysPageBitMap = new BitMap(256);
-pTab = new PTable(10);
-semTab = new STable();
+    //ADDED FOR PRJ3
+    addrLock = new Semaphore("addrLock", 1);
+    gPhysPageBitMap = new BitMap(256);
+    pTab = new PTable(10);
+    semTab = new STable();
 #endif
 
 #ifdef FILESYS
@@ -193,6 +193,12 @@ Cleanup()
 #ifdef USER_PROGRAM
 delete machine;
 delete gSynchConsole;
+
+//ADDED FOR PRJ3
+delete addrLock;
+delete gPhysPageBitMap;
+delete pTab;
+delete semTab;
 #endif
 
 #ifdef FILESYS_NEEDED

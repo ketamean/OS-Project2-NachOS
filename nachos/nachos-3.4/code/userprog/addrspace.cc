@@ -127,13 +127,21 @@ AddrSpace::AddrSpace(OpenFile *executable)
     if (noffH.code.size > 0)
     {
 	for(i = 0; i < numPages ; i++)
-	        executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]) + (pageTable[i].physicalPage*PageSize),PageSize,noffH.code.inFileAddr + (i*PageSize));
+	        executable->ReadAt(
+                &(machine->mainMemory[noffH.code.virtualAddr])+(pageTable[i].physicalPage*PageSize),
+                PageSize,
+                noffH.code.inFileAddr + (i*PageSize)
+            );
     }
 
     if (noffH.initData.size > 0)
     {
 	for(i = 0 ; i < numPages ; i++)
-	        executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]) + (pageTable[i].physicalPage*PageSize),PageSize, noffH.initData.inFileAddr+(i*PageSize));
+	        executable->ReadAt(
+                &(machine->mainMemory[noffH.initData.virtualAddr]) + (pageTable[i].physicalPage*PageSize),
+                PageSize,
+                noffH.initData.inFileAddr+(i*PageSize)
+            );
     }	
 
    //delete executable;
@@ -182,7 +190,7 @@ AddrSpace::AddrSpace(char* filename)
 	    numPages = 0;
 	    delete executable;
 	    addrLock->V();
-        return;
+        //return;
     }
 
     DEBUG('a', "Initializing address space, num pages %d, size %d\n", 
@@ -209,17 +217,24 @@ AddrSpace::AddrSpace(char* filename)
     if (noffH.code.size > 0)
     {
 	for(i = 0; i < numPages ; i++)
-	        executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]) + (pageTable[i].physicalPage*PageSize),PageSize,noffH.code.inFileAddr + (i*PageSize));
+	        executable->ReadAt(
+                &(machine->mainMemory[noffH.code.virtualAddr]) + (pageTable[i].physicalPage*PageSize),
+                PageSize,
+                noffH.code.inFileAddr + (i*PageSize)
+            );
     }
 
     if (noffH.initData.size > 0)
     {
 	for(i = 0 ; i < numPages ; i++)
-	        executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]) + (pageTable[i].physicalPage*PageSize),PageSize, noffH.initData.inFileAddr+(i*PageSize));
+	        executable->ReadAt(
+                &(machine->mainMemory[noffH.initData.virtualAddr]) + (pageTable[i].physicalPage*PageSize),
+                PageSize,
+                noffH.initData.inFileAddr+(i*PageSize)
+            );
     }	
 
    delete executable;
-
 }
 // =========================================================================
 // End Modified

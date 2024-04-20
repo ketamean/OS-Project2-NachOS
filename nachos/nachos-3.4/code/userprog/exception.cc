@@ -875,7 +875,7 @@ void handle_SC_Exec() {
 	// if an error occurs, it had already been printed before returing -1
 	
 	machine->WriteRegister(2, pTab->ExecUpdate(name));
-	delete[] name;
+	// delete[] name;
 }
 
 /* EXCEPTION HANDLER */

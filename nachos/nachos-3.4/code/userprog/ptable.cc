@@ -71,7 +71,7 @@ int PTable::ExecUpdate(char* filename)
 		return -1;
 	}
 ////////////////////////////////////////////////////////////
-	printf("PTable::ExecUpdate: file %s, pid = %d.\n", filename, ID);
+	printf("PTable::ExecUpdate: file %s, pid = %d; call PCB::Exec().\n", filename, ID);
 	pcb[ID]= new PCB(ID);
 	bm->Mark(ID);
 	pcb[ID]->parentID = currentThread->processID;
@@ -179,6 +179,6 @@ bool PTable::IsExist(int pID)
 
 char* PTable::GetName(int pID)
 {
-	if(pID>=0 && pID<10 && bm->Test(pID))
+	if(pID>=0 && pID<psize && bm->Test(pID))
 		return pcb[pID]->GetNameThread();
 }

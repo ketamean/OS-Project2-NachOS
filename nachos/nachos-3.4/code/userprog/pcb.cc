@@ -6,19 +6,22 @@
 
 PCB::PCB(int id)
 {
-	joinsem= new Semaphore("JoinSem",0);
-	exitsem= new Semaphore("ExitSem",0);
-	mutex= new Semaphore("Mutex",1);
+	
 	pid= id;
-	exitcode= 0;
-	numwait= 0;
+	
 	if(id)
 		parentID= currentThread->processID;
 	else
 		parentID= 0;
+	
+	numwait= 0;
+	exitcode= 0;
 	thread= NULL;
-	JoinStatus= -1;
+	joinsem= new Semaphore("JoinSem",0);
+	exitsem= new Semaphore("ExitSem",0);
+	mutex= new Semaphore("Mutex",1);
 
+	JoinStatus= -1;
 }
 
 PCB::~PCB()
@@ -38,7 +41,7 @@ PCB::~PCB()
 //------------------------------------------------------------------
 int PCB::GetID()
 {
-	return pid;
+	return thread->processID;
 }
 
 int PCB::GetNumWait()
@@ -53,7 +56,7 @@ int PCB::GetExitCode()
 
 void PCB::SetExitCode(int ec)
 {
-	exitcode= ec;
+	exitcode = ec;
 }
 
 void PCB::IncNumWait()
