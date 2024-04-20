@@ -143,7 +143,7 @@ int PTable::JoinUpdate(int pID)
 
 	if(ec != 0)
 	{
-		printf("\nProcess exit with exitcode EC = %d ",ec);
+		printf("\nProcess exit with exitcode EC = %d.\n",ec);
 		return -1;
 	}
 

@@ -83,7 +83,7 @@ char* PCB::GetNameThread()
 // call JoinWait() to block the current process until JoinRealease is invoked
 void PCB::JoinWait()
 {
-	//JoinStatus= parentID;
+	JoinStatus= parentID;
 	IncNumWait();
 	joinsem->P();
 }
@@ -91,7 +91,7 @@ void PCB::JoinWait()
 // release the blocked process that called JoinWait()
 void PCB::JoinRelease()
 {
-	DecNumWait();
+	//DecNumWait();
 	joinsem->V();
 }
 
