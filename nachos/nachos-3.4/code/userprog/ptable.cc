@@ -74,8 +74,11 @@ int PTable::ExecUpdate(char* filename)
 	printf("PTable::ExecUpdate: file %s, pid = %d; call PCB::Exec().\n", filename, ID);
 	pcb[ID]= new PCB(ID);
 	bm->Mark(ID);
+
 	pcb[ID]->parentID = currentThread->processID;
+
 	int pID= pcb[ID]->Exec(filename,ID);
+
 	bmsem->V();
 	return pID;
 }
@@ -135,7 +138,7 @@ int PTable::JoinUpdate(int pID)
 		return -1;
 	}
 /////////////////////////////////////////////////////////////////////////////////////////////
-	pcb[ pcb[pID]->parentID ]->IncNumWait(); // increase numwait of its parent process
+	//pcb[ pcb[pID]->parentID ]->IncNumWait(); // increase numwait of its parent process
 
 	pcb[pID]->JoinWait(); 	//doi den khi tien trinh con ket thuc
 

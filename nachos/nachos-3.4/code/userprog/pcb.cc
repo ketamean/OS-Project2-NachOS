@@ -61,17 +61,17 @@ void PCB::SetExitCode(int ec)
 
 void PCB::IncNumWait()
 {
-	mutex->P();
+	// mutex->P();
 	++numwait;
-	mutex->V();
+	// mutex->V();
 }
 
 void PCB::DecNumWait()
 {
-	mutex->P();
+	// mutex->P();
 	if(numwait)
 		--numwait;
-	mutex->V();
+	// mutex->V();
 }
 
 char* PCB::GetNameThread()
@@ -91,7 +91,7 @@ void PCB::JoinWait()
 // release the blocked process that called JoinWait()
 void PCB::JoinRelease()
 {
-	//DecNumWait();
+	DecNumWait();
 	joinsem->V();
 }
 
