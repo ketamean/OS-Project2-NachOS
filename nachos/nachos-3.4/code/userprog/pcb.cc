@@ -29,6 +29,10 @@ PCB::~PCB()
 		delete exitsem;
 	if(mutex != NULL)
 		delete mutex;
+	if(thread != NULL) {
+		thread->FreeSpace();
+		thread->Finish();
+	}
 }
 
 //------------------------------------------------------------------
@@ -54,13 +58,17 @@ void PCB::SetExitCode(int ec)
 
 void PCB::IncNumWait()
 {
+	mutex->P();
 	numwait++;
+	mutex->V();
 }
 
 void PCB::DecNumWait()
 {
+	mutex->P();
 	if(numwait)
 		numwait--;
+	mutex->V();
 }
 
 char* PCB::GetNameThread()
@@ -94,17 +102,24 @@ void PCB::ExitRelease()
 
 //------------------------------------------------------------------
 int PCB::Exec(char *filename, int pID)
-{
+{	
+	// call mutex to avoid running 2 process at a time
 	mutex->P();
 	thread= new Thread(filename);
 	if(thread == NULL)
 	{
-		printf("\nLoi: Khong tao duoc tien trinh moi !!!\n");
+		printf("\nPCB::Exec: cannot create new thread\n");
 		mutex->V();
 		return -1;
 	}
 	thread->processID= pID;
+
+	// parent id of the current thread is the thread which invokes Exec
+	parentID = currentThread->processID;
+
+	// call Fork => type-cast Thread to int
 	thread->Fork(MyStartProcess,pID);
+	
 	mutex->V();
 	return pID;
 }

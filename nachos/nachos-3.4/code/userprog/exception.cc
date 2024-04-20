@@ -720,7 +720,6 @@ void handle_SC_Join() {
 	int res = pTab->JoinUpdate(id); // Update the process
 	
 	machine->WriteRegister(2, res);
-	return;
 }
 
 void handle_SC_Exit() {
@@ -733,7 +732,6 @@ void handle_SC_Exit() {
 
 	currentThread->FreeSpace(); // Free the space
 	currentThread->Finish(); // Finish the thread
-	return; 
 }
 
 
@@ -748,13 +746,13 @@ void handle_SC_CreateSemaphore() {
 	int semval = machine->ReadRegister(5);
 
 	// Change addr "name" from user space to system space
-	char *name = machine->User2System(virtAddr, MaxFileLength + 1);
+	char *name = machine->User2System(virtAddr, MAX_FILENAME_LEN + 1);
 
 	// Check "name"
 	if(name == NULL)
 	{
 		DEBUG('a', "\n Not enough memory in System \n");
-		printf("\n Not enough memory in System \n");
+		printf("\n syscall CreateSemaphore: Not enough memory in System \n");
 		machine->WriteRegister(2, -1);
 		delete[] name;
 		return;
@@ -766,7 +764,7 @@ void handle_SC_CreateSemaphore() {
 	if(res == -1)
 	{
 		DEBUG('a', "\nCannot create semaphore (%s, %d)", name, &semval);
-		printf("\n Cannot create semaphore (%s, %d)", name, &semval);
+		printf("\nsyscall CreateSemaphore: Cannot create semaphore (%s, %d)", name, &semval);
 		machine->WriteRegister(2, -1);
 		delete[] name;
 		return;				
@@ -774,7 +772,6 @@ void handle_SC_CreateSemaphore() {
 	delete[] name;
 	// Write the result to register r2
 	machine->WriteRegister(2, res);
-	return;
 }
 
 void handle_SC_Up() { 
@@ -860,7 +857,7 @@ void handle_SC_Exec() {
 
 	char* name = machine->User2System(virtAddr, MAX_FILENAME_LEN);
 	if (name == NULL) {
-		printf("Cannot get file name: not enough memory\n.");
+		printf("\nsyscall Exec: Cannot get file name-not enough memory\n.");
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
 	}
@@ -868,7 +865,7 @@ void handle_SC_Exec() {
 	// check whether the file is readable
 	OpenFile* f = fileSystem->Open(name);
 	if ( f == NULL ) {
-		printf("Cannot open file %s\n.", name);
+		printf("\nsyscall Exec: Cannot open file %s\n.", name);
 		machine->WriteRegister(2, -1); 	// returns error
 		return;
 	}

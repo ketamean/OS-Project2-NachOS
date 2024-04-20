@@ -70,7 +70,6 @@ BitMap::Clear(int which)
 //
 //	"which" is the number of the bit to be tested.
 //----------------------------------------------------------------------
-
 bool 
 BitMap::Test(int which)
 {
