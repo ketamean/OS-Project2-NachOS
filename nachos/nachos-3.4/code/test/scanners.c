@@ -5,36 +5,37 @@ int main() {
   int scanner1 = 0;
   int scanner2 = 0;
   int scanner3 = 0;
+  int writeScannerId, readLugWeight, weight, readEndline, isEnd;
   while (1)
   {
-    Wait('maincounter');
-    int writeScannerId = OpenF('scannerid.txt', 0);
+    Wait("maincounter");
+    writeScannerId = OpenF("scannerid.txt", 0);
     if (writeScannerId == -1) {
-      PrintString('Loi mo file scannerid.txt');
-      Signal('passengers');
+      PrintString("Loi mo file scannerid.txt");
+      Signal("passengers");
     }
     while (1) {
-      Wait('scanners');
+      Wait("scanners");
       
-      int readLugWeight = OpenF('lugweight.txt', 1);
+      readLugWeight = OpenF("lugweight.txt", 1);
       if (readLugWeight == -1) {
-        PrintString('Loi doc file lugweight.txt tu scanners');
+        PrintString("Loi doc file lugweight.txt tu scanners");
         CloseF(writeScannerId);
-        Signal('passengers');
+        Signal("passengers");
         return 0;
       }
 
-      int weight = 0;
-      int readEndline = 0;
+      weight = 0;
+      readEndline = 0;
       while (1) {
-        char* buffer = '\n';
-        int isEnd = ReadF(buffer, 1, readLugWeight);
+        char* buffer = "\n";
+        isEnd = ReadF(buffer, 1, readLugWeight);
         if (isEnd < 0) {
           CloseF(readLugWeight);
           break;
         } 
-        if (buffer != '\n') {
-          weight = weight * 10 + (buffer - '0');
+        if (buffer != "\n") {
+          weight = weight * 10 + (buffer - "0");
         } else {
           readEndline = 1;
           CloseF(readLugWeight);
@@ -44,13 +45,13 @@ int main() {
       if (weight != 0) {
         if (scanner1 <= scanner2 && scanner1 <= scanner3) {
           scanner1 += weight;
-          WriteF('1',1, writeScannerId);
+          WriteF("1",1, writeScannerId);
         } else if (scanner2 <= scanner1 && scanner2 <= scanner3) {
           scanner2 += weight;
-          WriteF('2',1,writeScannerId);
+          WriteF("2",1,writeScannerId);
         } else {
           scanner3 += weight;
-          WriteF('3',1,writeScannerId);
+          WriteF("3",1,writeScannerId);
         }
       }
       if (readEndline == 1) {
@@ -58,7 +59,7 @@ int main() {
         scanner2 = 0;
         scanner3 = 0;
         CloseF(writeScannerId);
-        Signal('passengers');
+        Signal("passengers");
         break;
       }
     }
