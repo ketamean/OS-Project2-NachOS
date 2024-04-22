@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort testfile kb help ascii quicksort mergesort
+all: halt shell matmult sort testfile kb help ascii quicksort mergesort scannersmain passengers scanners
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -100,3 +100,21 @@ mergesort.o: mergesort.c
 mergesort: mergesort.o start.o
 	$(LD) $(LDFLAGS) start.o mergesort.o -o mergesort.coff
 	../bin/coff2noff mergesort.coff mergesort
+
+scannersmain.o: scannersmain.c
+	$(CC) $(CFLAGS) -c scannersmain.c
+scannersmain: scannersmain.o start.o
+	$(LD) $(LDFLAGS) start.o scannersmain.o -o scannersmain.coff
+	../bin/coff2noff scannersmain.coff scannersmain
+
+scanners.o: scanners.c
+	$(CC) $(CFLAGS) -c scanners.c
+scanners: scanners.o start.o
+	$(LD) $(LDFLAGS) start.o scanners.o -o scanners.coff
+	../bin/coff2noff scanners.coff scanners
+
+passengers.o: passengers.c
+	$(CC) $(CFLAGS) -c passengers.c
+passengers: passengers.o start.o
+	$(LD) $(LDFLAGS) start.o passengers.o -o passengers.coff
+	../bin/coff2noff passengers.coff passengers
