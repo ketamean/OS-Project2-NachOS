@@ -3,10 +3,11 @@
 
 int main() {
   int passengersPID, scannersPID, semaphoreCheck;
-  char *saveWeight = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+  char *saveWeight = "                                                                                                                         ";
   int saveSize = -1;
   int readInput, numPoint, writeOutput, fileStatus, writePassengers, readScannerId, readSuccess, idSave;
-  // -------------------------------------------------------
+  char tempbuffer; 
+// -------------------------------------------------------
   semaphoreCheck = CreateSemaphore("main", 0);
   if (semaphoreCheck == -1) {
     PrintString("Loi tao semaphore\n");
@@ -28,21 +29,24 @@ int main() {
     return 0;
   }
 
-  readInput = OpenF("input.txt", 1);
+  readInput = OpenF("input.txt", 0);
   if (readInput == -1){
     PrintString("Khong the doc file input \n");
     return 0;
   }
   numPoint = 0;
   while (1) { //while True but C doesn"t support boolean
-    char* buffer="\n";
-    ReadF(buffer, 1, readInput);
-    if (buffer == "\n") break;
+    ReadF(&tempbuffer, 1, readInput);
+    if (tempbuffer == '\n') break;
     else {
-      if (buffer >= "0" && buffer <= "9")
-        numPoint = numPoint * 10 + (buffer - "0");
+      if (tempbuffer >= '0' && tempbuffer <= '9')
+        numPoint = numPoint * 10 + (tempbuffer - '0');
     }
   }
+  PrintString("Gia tri so la: ");
+  PrintInt(numPoint);
+  PrintString("\n");
+
   fileStatus = CreateF("output.txt");
   if (fileStatus == -1) {
     PrintString("Loi tao file output.txt\n");
@@ -60,8 +64,8 @@ int main() {
   if (passengersPID == -1) return 0;
   scannersPID = Exec("./test/scanners");
   if (scannersPID == -1) return 0;
-  Join(passengersPID);
-  Join(scannersPID);
+  //Join(passengersPID);
+  //Join(scannersPID);
 
   while (numPoint--) {
     fileStatus = CreateF("pasengers.txt");
@@ -79,23 +83,25 @@ int main() {
       return 0;
     }
     // Doc file input.txt va ghi noi dung vao file passengers.txt
+    PrintString("Lan handle thu: ");
+    PrintInt(numPoint);
+    PrintString("\n");
     while (1)
     {
-      char* buffer = "\n";
-      readSuccess = ReadF(buffer,1,readInput);
+      readSuccess = ReadF(&tempbuffer,1,readInput);
       if (readSuccess <= 0) break;
       // handle reprint weight 
       saveSize = saveSize + 1;
-      saveWeight[saveSize] = buffer;
+      saveWeight[saveSize] = tempbuffer;
       // ghi noi dung vao file passengers.txt
-      if (buffer == "\n") break;
-      else WriteF(buffer, 1, writePassengers);
+      if (tempbuffer == '\n') break;
+      else WriteF(&tempbuffer, 1, writePassengers);
       
     }
     CloseF(writePassengers);
     Up("passengers");
     Down("main");
-    readScannerId = OpenF("scannerid.txt", 1);
+    readScannerId = OpenF("scannerid.txt", 0);
     if (readScannerId == -1) {
       CloseF(readInput);
       CloseF(writeOutput);
@@ -103,25 +109,16 @@ int main() {
     }
     idSave = 0;
     while (1) {
-      char *buffer = "\0";
-      int readStatus = ReadF(buffer, 1, readScannerId);
+	
+      int readStatus = ReadF(&tempbuffer, 1, readScannerId);
       if (readStatus < 0) {
-        Write("\r\n",2, writeOutput);
+        WriteF("\r\n",2, writeOutput);
         CloseF(readScannerId);
         Up("maincounter");
         break;
       }
-      
-      while (1) {
-        if (saveWeight[idSave] != " " || saveWeight[idSave] != "\n") {
-          WriteF(saveWeight[idSave], 1, writeOutput);
-          idSave = idSave + 1;
-        } else {
-          WriteF(" ",1, writeOutput);
-          idSave = idSave + 1;
-        }
-      }
-      WriteF(buffer, 1, writeOutput);
+
+      WriteF(&tempbuffer, 1, writeOutput);
       WriteF("       ", 7, writeOutput);
     }
   }
