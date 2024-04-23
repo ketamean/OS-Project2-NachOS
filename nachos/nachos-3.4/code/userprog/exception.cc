@@ -656,7 +656,7 @@ void handle_SC_CloseFile() {
 	} // else
 	delete f;
 	fileSystem->file_table[fileid] = NULL;
-	printf("File is closed with ID <%d>\n", fileid);
+	// printf("File is closed with ID <%d>\n", fileid);
 	machine->WriteRegister(2, 0);
 }
 
@@ -705,7 +705,7 @@ void handle_SC_OpenFile() {
 		delete[] fname;
 		return;
 	}
-	printf("File is opened with ID <%d>\n", f);
+	// printf("File is opened with ID <%d>\n", f);
 	machine->WriteRegister(2, f); 	// returns OpenFileID
 	delete[] fname;
 }

@@ -37,7 +37,7 @@
 
 #include "copyright.h"
 #include "openfile.h"
-#define N_FILES_IN_TABLE 10
+#define N_FILES_IN_TABLE 100
 #ifdef FILESYS_STUB 		// Temporarily implement file system calls as 
 				// calls to UNIX, until the real file system
 				// implementation is available

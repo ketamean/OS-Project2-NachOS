@@ -68,7 +68,7 @@ int main() {
   //Join(scannersPID);
 
   while (numPoint--) {
-    fileStatus = CreateF("pasengers.txt");
+    fileStatus = CreateF("passengers.txt");
     if (fileStatus == -1) {
       CloseF(readInput);
       CloseF(writeOutput);

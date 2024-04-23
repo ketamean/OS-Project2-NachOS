@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort testfile kb help ascii quicksort mergesort scannersmain passengers scanners
+all: halt scannersmain passengers scanners
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -47,59 +47,6 @@ halt.o: halt.c
 halt: halt.o start.o
 	$(LD) $(LDFLAGS) start.o halt.o -o halt.coff
 	../bin/coff2noff halt.coff halt
-
-shell.o: shell.c
-	$(CC) $(CFLAGS) -c shell.c
-shell: shell.o start.o
-	$(LD) $(LDFLAGS) start.o shell.o -o shell.coff
-	../bin/coff2noff shell.coff shell
-
-sort.o: sort.c
-	$(CC) $(CFLAGS) -c sort.c
-sort: sort.o start.o
-	$(LD) $(LDFLAGS) start.o sort.o -o sort.coff
-	../bin/coff2noff sort.coff sort
-
-matmult.o: matmult.c
-	$(CC) $(CFLAGS) -c matmult.c
-matmult: matmult.o start.o
-	$(LD) $(LDFLAGS) start.o matmult.o -o matmult.coff
-	../bin/coff2noff matmult.coff matmult
-
-testfile.o: testfile.c
-	$(CC) $(CFLAGS) -c testfile.c
-testfile: testfile.o start.o
-	$(LD) $(LDFLAGS) start.o testfile.o -o testfile.coff
-	../bin/coff2noff testfile.coff testfile 
-kb.o: kb.c
-	$(CC) $(CFLAGS) -c kb.c
-kb: kb.o start.o
-	$(LD) $(LDFLAGS) start.o kb.o -o kb.coff
-	../bin/coff2noff kb.coff kb
-
-help.o: help.c
-	$(CC) $(CFLAGS) -c help.c
-help: help.o start.o
-	$(LD) $(LDFLAGS) start.o help.o -o help.coff
-	../bin/coff2noff help.coff help
-
-ascii.o: ascii.c
-	$(CC) $(CFLAGS) -c ascii.c
-ascii: ascii.o start.o
-	$(LD) $(LDFLAGS) start.o ascii.o -o ascii.coff
-	../bin/coff2noff ascii.coff ascii
-
-quicksort.o: quicksort.c
-	$(CC) $(CFLAGS) -c quicksort.c
-quicksort: quicksort.o start.o
-	$(LD) $(LDFLAGS) start.o quicksort.o -o quicksort.coff
-	../bin/coff2noff quicksort.coff quicksort
-
-mergesort.o: mergesort.c
-	$(CC) $(CFLAGS) -c mergesort.c
-mergesort: mergesort.o start.o
-	$(LD) $(LDFLAGS) start.o mergesort.o -o mergesort.coff
-	../bin/coff2noff mergesort.coff mergesort
 
 scannersmain.o: scannersmain.c
 	$(CC) $(CFLAGS) -c scannersmain.c
