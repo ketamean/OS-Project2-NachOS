@@ -28,12 +28,6 @@ int main() {
     return 0;
   }
 
-
-  execCheck = Exec("./test/passengers");
-  if (execCheck == -1) return 0;
-  execCheck = Exec("./test/scanners");
-  if (execCheck == -1) return 0;
-
   readInput = OpenF("input.txt", 1);
   if (readInput == -1){
     PrintString("Khong the doc file input \n");
@@ -55,6 +49,12 @@ int main() {
     PrintString("Khong the tao file output de viet ket qua \n");
     return 0;
   }
+
+  execCheck = Exec("./test/passengers");
+  if (execCheck == -1) return 0;
+  execCheck = Exec("./test/scanners");
+  if (execCheck == -1) return 0;
+
   while (numPoint--) {
     fileStatus = CreateF("pasengers.txt");
     if (fileStatus == -1) {
