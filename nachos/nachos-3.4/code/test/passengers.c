@@ -2,11 +2,11 @@
 #include "copyright.h"
 
 int getFileLength(int id) {
-  char* tempbuffer = '\n';
+  char tempbuffer;
   int cnt = 0;
   int isValid;
   while (1) {
-    isValid = ReadF(tempbuffer,1, id);
+    isValid = ReadF(&tempbuffer,1, id);
     if (isValid < 0) break;
     cnt = cnt + 1;
   }
@@ -15,7 +15,7 @@ int getFileLength(int id) {
 
 int main() {
   int fileStatus, readPassengers, fileLength, writeLugWeight, filePointer, isEndLug;
-  char* buffer = '\n';
+  char tempbuffer;
   // ----------------------------------------
   
   Up("maincounter");
@@ -27,7 +27,7 @@ int main() {
       Up("main");
       return 0;
     }
-    readPassengers = OpenF("passengers.txt", 1);
+    readPassengers = OpenF("passengers.txt", 0);
     if (readPassengers == -1) {
       PrintString("Loi doc file passengers.txt \n");
       Up("main");
@@ -35,7 +35,7 @@ int main() {
     }
     fileLength = getFileLength(readPassengers);
     CloseF(readPassengers);
-    readPassengers = OpenF("passengers.txt", 1);
+    readPassengers = OpenF("passengers.txt", 0);
 
     fileStatus = CreateF("lugweight.txt");
     if (fileStatus == -1) {
@@ -44,7 +44,7 @@ int main() {
       Up("main");
       return 0;
     }
-    writeLugWeight = OpenF("lugweight.txt", "0");
+    writeLugWeight = OpenF("lugweight.txt", 0);
     if (writeLugWeight == -1) {
       PrintString("Loi mo file lugweight.txt\n");
       CloseF(readPassengers);
@@ -55,9 +55,9 @@ int main() {
     while (filePointer < fileLength) {
 
       isEndLug = 0;
-      ReadF(buffer, 1, readPassengers);
-      if (buffer != " ") {
-        WriteF(buffer,1,writeLugWeight);
+      ReadF(&tempbuffer, 1, readPassengers);
+      if (tempbuffer != ' ') {
+        WriteF(&tempbuffer,1,writeLugWeight);
       } else {
         isEndLug = 1;
       }

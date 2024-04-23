@@ -6,6 +6,7 @@ int main() {
   int scanner2 = 0;
   int scanner3 = 0;
   int writeScannerId, readLugWeight, weight, readEndline, isEnd;
+char tempbuffer;
   while (1)
   {
     Down("maincounter");
@@ -17,7 +18,7 @@ int main() {
     while (1) {
       Down("scanners");
       
-      readLugWeight = OpenF("lugweight.txt", 1);
+      readLugWeight = OpenF("lugweight.txt", 0);
       if (readLugWeight == -1) {
         PrintString("Loi doc file lugweight.txt tu scanners");
         CloseF(writeScannerId);
@@ -28,21 +29,23 @@ int main() {
       weight = 0;
       readEndline = 0;
       while (1) {
-        char* buffer = "\n";
-        isEnd = ReadF(buffer, 1, readLugWeight);
+        isEnd = ReadF(&tempbuffer, 1, readLugWeight);
         if (isEnd < 0) {
           CloseF(readLugWeight);
           break;
         } 
-        if (buffer != "\n") {
-          weight = weight * 10 + (buffer - "0");
-        } else {
+        if (tempbuffer >= '0' && tempbuffer <= '9') {
+          weight = weight * 10 + (tempbuffer - '0');
+        } else if (tempbuffer == '\n') {
           readEndline = 1;
           CloseF(readLugWeight);
           break;
         }
       }
       if (weight != 0) {
+	PrintString("weight: ");
+	PrintInt(weight);
+	PrintString("\n");
         if (scanner1 <= scanner2 && scanner1 <= scanner3) {
           scanner1 += weight;
           WriteF("1",1, writeScannerId);
@@ -62,6 +65,7 @@ int main() {
         Up("passengers");
         break;
       }
+	Up("passengers");
     }
   }
   
