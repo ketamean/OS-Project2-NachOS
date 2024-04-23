@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort testfile kb help ascii quicksort mergesort ping pong pingpong
+all: halt shell matmult sort testfile kb help ascii quicksort mergesort scannersmain passengers scanners
 
 start.o: start.s ../userprog/syscall.h
 	$(CPP) $(CPPFLAGS) start.c > strt.s
@@ -101,20 +101,20 @@ mergesort: mergesort.o start.o
 	$(LD) $(LDFLAGS) start.o mergesort.o -o mergesort.coff
 	../bin/coff2noff mergesort.coff mergesort
 
-ping.o: ping.c
-	$(CC) $(CFLAGS) -c ping.c
-ping: ping.o start.o
-	$(LD) $(LDFLAGS) start.o ping.o -o ping.coff
-	../bin/coff2noff ping.coff ping
+scannersmain.o: scannersmain.c
+	$(CC) $(CFLAGS) -c scannersmain.c
+scannersmain: scannersmain.o start.o
+	$(LD) $(LDFLAGS) start.o scannersmain.o -o scannersmain.coff
+	../bin/coff2noff scannersmain.coff scannersmain
 
-pong.o: pong.c
-	$(CC) $(CFLAGS) -c pong.c
-pong: pong.o start.o
-	$(LD) $(LDFLAGS) start.o pong.o -o pong.coff
-	../bin/coff2noff pong.coff pong
+scanners.o: scanners.c
+	$(CC) $(CFLAGS) -c scanners.c
+scanners: scanners.o start.o
+	$(LD) $(LDFLAGS) start.o scanners.o -o scanners.coff
+	../bin/coff2noff scanners.coff scanners
 
-pingpong.o: pingpong.c
-	$(CC) $(CFLAGS) -c pingpong.c
-pingpong: pingpong.o start.o
-	$(LD) $(LDFLAGS) start.o pingpong.o -o pingpong.coff
-	../bin/coff2noff pingpong.coff pingpong
+passengers.o: passengers.c
+	$(CC) $(CFLAGS) -c passengers.c
+passengers: passengers.o start.o
+	$(LD) $(LDFLAGS) start.o passengers.o -o passengers.coff
+	../bin/coff2noff passengers.coff passengers
