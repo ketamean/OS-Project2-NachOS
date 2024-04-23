@@ -43,10 +43,16 @@ int main() {
         numPoint = numPoint * 10 + (buffer - "0");
     }
   }
+  fileStatus = CreateF("output.txt");
+  if (fileStatus == -1) {
+    PrintString('Loi tao file output.txt\n');
+    return 0;
+  }
+
   writeOutput = OpenF("output.txt", 0);
   if (writeOutput == -1) {
     CloseF(readInput);
-    PrintString("Khong the tao file output de viet ket qua \n");
+    PrintString("Khong mo file output.txt de viet ket qua \n");
     return 0;
   }
 
