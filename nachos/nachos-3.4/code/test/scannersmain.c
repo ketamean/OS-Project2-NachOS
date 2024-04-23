@@ -85,8 +85,8 @@ int main() {
       
     }
     CloseF(writePassengers);
-    Signal("passengers");
-    Wait("main");
+    Up("passengers");
+    Down("main");
     readScannerId = OpenF("scannerid.txt", 1);
     if (readScannerId == -1) {
       CloseF(readInput);
@@ -100,7 +100,7 @@ int main() {
       if (readStatus < 0) {
         Write("\r\n",2, writeOutput);
         CloseF(readScannerId);
-        Signal("maincounter");
+        Up("maincounter");
         break;
       }
       

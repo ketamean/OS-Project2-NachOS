@@ -8,20 +8,20 @@ int main() {
   int writeScannerId, readLugWeight, weight, readEndline, isEnd;
   while (1)
   {
-    Wait("maincounter");
+    Down("maincounter");
     writeScannerId = OpenF("scannerid.txt", 0);
     if (writeScannerId == -1) {
       PrintString("Loi mo file scannerid.txt");
-      Signal("passengers");
+      Up("passengers");
     }
     while (1) {
-      Wait("scanners");
+      Down("scanners");
       
       readLugWeight = OpenF("lugweight.txt", 1);
       if (readLugWeight == -1) {
         PrintString("Loi doc file lugweight.txt tu scanners");
         CloseF(writeScannerId);
-        Signal("passengers");
+        Up("passengers");
         return 0;
       }
 
@@ -59,7 +59,7 @@ int main() {
         scanner2 = 0;
         scanner3 = 0;
         CloseF(writeScannerId);
-        Signal("passengers");
+        Up("passengers");
         break;
       }
     }

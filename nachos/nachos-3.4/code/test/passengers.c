@@ -18,19 +18,19 @@ int main() {
   char* buffer = '\n';
   // ----------------------------------------
   
-  Signal("maincounter");
+  Up("maincounter");
   while(1) {
-    Wait("passengers");
+    Down("passengers");
     fileStatus = CreateF("scannerid.txt");
     if (fileStatus == -1) {
       PrintString("Loi tao file scannerid.txt\n");
-      Signal("main");
+      Up("main");
       return 0;
     }
     readPassengers = OpenF("passengers.txt", 1);
     if (readPassengers == -1) {
       PrintString("Loi doc file passengers.txt \n");
-      Signal("main");
+      Up("main");
       return 0;
     }
     fileLength = getFileLength(readPassengers);
@@ -41,14 +41,14 @@ int main() {
     if (fileStatus == -1) {
       PrintString("Loi tao file lugweight.txt\n");
       CloseF(readPassengers);
-      Signal("main");
+      Up("main");
       return 0;
     }
     writeLugWeight = OpenF("lugweight.txt", "0");
     if (writeLugWeight == -1) {
       PrintString("Loi mo file lugweight.txt\n");
       CloseF(readPassengers);
-      Signal("main");
+      Up("main");
       return 0;
     }
     filePointer = 0;
@@ -69,28 +69,28 @@ int main() {
       if (isEndLug == 1)
       {
         CloseF(writeLugWeight);
-        Signal("scanners");
+        Up("scanners");
 
-        Wait("passengers");
+        Down("passengers");
 
         fileStatus = CreateF("lugweight.txt");
         if (fileStatus == -1) {
           PrintString("Loi tao file lugweight.txt trong vong lap\n");
           CloseF(readPassengers);
-          Signal("main");
+          Up("main");
           return 0;
         }
         writeLugWeight = OpenF("lugweight.txt",0);
         if (writeLugWeight == -1) {
           PrintString("Loi mo file lugweight.txt trong vong lap\n");
           CloseF(readPassengers);
-          Signal("main");
+          Up("main");
           return 0;
         }
       }
       filePointer = filePointer + 1;
     }
-    Signal("main");
+    Up("main");
   }
   return 0;
 }
